@@ -39,6 +39,7 @@ public class BootstrapServer {
                 String command = st.nextToken();
 
                 if (command.equals("REG")) {
+//                    System.out.println("reg");
                     String reply = "REGOK ";
 
                     String ip = st.nextToken();

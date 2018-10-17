@@ -15,6 +15,8 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -25,17 +27,17 @@ public class Client {
     private DatagramSocket socket;
     private InetAddress address;
     private String userName;
-    private ArrayList<Client> clientList;
+    private List clientList;
     private byte[] buf;
     private int port;
     private DatagramChannel channel;
 
     public Client(String userName, int port) throws UnknownHostException, SocketException, IOException {
-//        socket = new DatagramSocket();
+        socket = new DatagramSocket();
         this.channel = DatagramChannel.open();
         channel.socket().bind(new InetSocketAddress(port));
         address = InetAddress.getByName("localhost");
-        clientList = new ArrayList<>();
+        clientList = Collections.synchronizedList(new ArrayList<Client>());
         this.userName = userName;
     }
 
@@ -45,51 +47,40 @@ public class Client {
         this.port = port;
     }
 
-    public String sendMsg(String msg, InetAddress ip, int port) throws IOException {
-        buf = msg.getBytes();
-        ByteBuffer buffer = ByteBuffer.allocate(48);
-        buffer.clear();
-        buffer.put(msg.getBytes());
-        buffer.flip();
-        int bytesSent = channel.send(buffer, new InetSocketAddress(ip, port));
-//        DatagramPacket packet
-//                = new DatagramPacket(buf, buf.length, ip, port);
-        System.out.println("before send");
-//        socket.send(packet);
-        System.out.println("after send");
+//    public String sendMsg(String msg, InetAddress ip, int port) throws IOException {
+//        buf = msg.getBytes();
+//        ByteBuffer buffer = ByteBuffer.allocate(48);
+//        buffer.clear();
+//        buffer.put(msg.getBytes());
+//        buffer.flip();
+//        int bytesSent = channel.send(buffer, new InetSocketAddress(ip, port));
+//        buffer.clear();
+//        channel.receive(buffer);
+//        return buffer.array().;
+////        String received = new String(
+////                packet.getData(), 0, packet.getLength());
+////        return received;
+//    }
 
-//        packet = new DatagramPacket(buf, buf.length);
-//
-//        socket.receive(packet);
-        System.out.println("before receive");
-        buffer.clear();
-        channel.receive(buffer);
-        System.out.println("after receive");
-        return buffer.toString();
-//        String received = new String(
-//                packet.getData(), 0, packet.getLength());
-//        return received;
-    }
-    public int sendMsg1(String msg, InetAddress ip, int port) throws IOException {
-        buf = msg.getBytes();
-        ByteBuffer buffer = ByteBuffer.allocate(48);
-        buffer.clear();
-        buffer.put(msg.getBytes());
-        buffer.flip();
-        int bytesSent = channel.send(buffer, new InetSocketAddress(ip, port));
-//        DatagramPacket packet
-//                = new DatagramPacket(buf, buf.length, ip, port);
-        return bytesSent;
-//        String received = new String(
-//                packet.getData(), 0, packet.getLength());
-//        return received;
+    public String sendMsg(String msg, InetAddress ip, int port) throws IOException {
+        DatagramSocket clientSocket = socket;
+        byte[] sendData = new byte[1024];
+        byte[] receiveData = new byte[1024];
+        sendData = msg.getBytes();
+        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, ip, port);
+        clientSocket.send(sendPacket);
+        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+        clientSocket.receive(receivePacket);
+        String response = new String(receivePacket.getData());
+        System.out.println("FROM SERVER:" + response);
+        return response;
     }
 
     public void close() {
         socket.close();
     }
 
-    public ArrayList<Client> getClientList() {
+    public List getClientList() {
         return clientList;
     }
 

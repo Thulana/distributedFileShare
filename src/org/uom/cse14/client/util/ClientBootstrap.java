@@ -34,9 +34,10 @@ public class ClientBootstrap {
     }
     
     
-    public int registerClient(String address,int port) throws IOException{
+    public String registerClient(String address,int port) throws IOException{
         String msg = "REG "+address+" "+port+" "+client.getUserName();
-        return client.sendMsg1(msg, BootstrapAddr, BootstrapPort);
+        msg = msg.length()+" "+msg;
+        return client.sendMsg(msg, BootstrapAddr, BootstrapPort);
     }
     
 }

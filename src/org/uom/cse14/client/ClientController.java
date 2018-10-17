@@ -23,12 +23,11 @@ public class ClientController {
     public static int bootstrapPort = 55555;
     public static void main(String[] args) {
         try {
-            Client client = new Client("testClient",2232);
-            ClientServer clientServer = new ClientServer(2233, client);
+            Client client = new Client("testClient2",2237);
+            ClientServer clientServer = new ClientServer(2236, client);
             ClientBootstrap bootstrap = new ClientBootstrap(client, InetAddress.getByName(ClientController.bootstrapIP),ClientController.bootstrapPort );
-                System.out.println("jfkd");
-            int response = bootstrap.registerClient(bootstrapIP, 2233);
-            System.out.println("response"+response);
+            String response = bootstrap.registerClient(bootstrapIP, 2236);
+            System.out.println("response : "+response);
             
         } catch (UnknownHostException ex) {
             Logger.getLogger(ClientController.class.getName()).log(Level.SEVERE, null, ex);
