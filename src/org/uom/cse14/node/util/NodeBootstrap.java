@@ -36,25 +36,56 @@ public class NodeBootstrap {
     
     
     public String registerClient(String address,int port) throws IOException{
-        String msg = "REG "+address+" "+port+" "+client.getUserName();
+        String msg = "REG "+address+" "+port+" "+getClient().getUserName();
         msg = msg.length()+" "+msg;
-        String response = client.sendMsg(msg, BootstrapAddr, BootstrapPort);
+        String response = getClient().sendMsg(msg, getBootstrapAddr(), getBootstrapPort());
         String[] commandList = response.split(" ");
+        System.out.println(response);
         int responsetype = Integer.parseInt(response.split(" ")[2].trim());
         if (responsetype == 9998){
-            System.out.println("bootstrap says same user");
+//            System.out.println("bootstrap says same user");
+            return "bootstrap says same user";
         }else if(responsetype == 0){
-            System.out.println("bootstrap says no user");
+//            System.out.println("bootstrap says no user");
+            return "bootstrap says no user";
         }else if(responsetype == 1){
-            BasicNode client = new BasicNode(InetAddress.getByName(commandList[-2]), Integer.parseInt(commandList[-1]));
-            this.client.addNeighbour(client);
+            BasicNode client = new BasicNode(InetAddress.getByName(commandList[commandList.length-2].trim()), Integer.parseInt(commandList[commandList.length-1].trim()));
+            this.getClient().addNeighbour(client);
         }else if(responsetype == 2){
-            BasicNode client = new BasicNode(InetAddress.getByName(commandList[-2]), Integer.parseInt(commandList[-1]));
-            this.client.addNeighbour(client);
-            client = new BasicNode(InetAddress.getByName(commandList[-4]), Integer.parseInt(commandList[-3]));
-            this.client.addNeighbour(client);
+            BasicNode client = new BasicNode(InetAddress.getByName(commandList[commandList.length-2].trim()), Integer.parseInt(commandList[commandList.length-1].trim()));
+            this.getClient().addNeighbour(client);
+            client = new BasicNode(InetAddress.getByName(commandList[commandList.length-4].trim()), Integer.parseInt(commandList[commandList.length-3].trim()));
+            this.getClient().addNeighbour(client);
         }
         return response;
+    }
+
+    /**
+     * @return the client
+     */
+    public Node getClient() {
+        return client;
+    }
+
+    /**
+     * @param client the client to set
+     */
+    public void setClient(Node client) {
+        this.client = client;
+    }
+
+    /**
+     * @return the BootstrapAddr
+     */
+    public InetAddress getBootstrapAddr() {
+        return BootstrapAddr;
+    }
+
+    /**
+     * @return the BootstrapPort
+     */
+    public int getBootstrapPort() {
+        return BootstrapPort;
     }
     
 }

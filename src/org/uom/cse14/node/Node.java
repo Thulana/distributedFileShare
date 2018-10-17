@@ -34,8 +34,8 @@ public class Node extends BasicNode {
 
     public Node(String userName, int port) throws UnknownHostException, SocketException, IOException {
         socket = new DatagramSocket();
-        this.channel = DatagramChannel.open();
-        channel.socket().bind(new InetSocketAddress(port));
+//        this.channel = DatagramChannel.open();
+//        channel.socket().bind(new InetSocketAddress(port));
         address = InetAddress.getByName("localhost");
         clientList = Collections.synchronizedList(new ArrayList<BasicNode>());
         this.userName = userName;
