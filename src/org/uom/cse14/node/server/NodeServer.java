@@ -1,4 +1,4 @@
-package org.uom.cse14.client.server;
+package org.uom.cse14.node.server;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -6,21 +6,22 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import org.uom.cse14.client.Client;
+import org.uom.cse14.node.BasicNode;
+import org.uom.cse14.node.Node;
 
 //import org.apache.log4j.Logger;
-public class ClientServer implements Runnable {
+public class NodeServer implements Runnable {
 //	final static Logger logger = Logger.getLogger(Server.class);
 
     private DatagramSocket serverSocket;
     private byte[] in;
     private byte[] out;
-    private Client client;
+    private Node client;
 
     /*
 	 * Our constructor which instantiates our serverSocket
      */
-    public ClientServer(int port, Client client) throws SocketException {
+    public NodeServer(int port, Node client) throws SocketException {
         serverSocket = new DatagramSocket(port);
         this.client = client;
     }
@@ -66,7 +67,7 @@ public class ClientServer implements Runnable {
     }
 
     public void join(String msg,InetAddress address,int port ) throws UnknownHostException, IOException {
-        Client newClient = new Client(InetAddress.getByName(msg.split(" ")[2]), msg.split(" ")[4], Integer.parseInt(msg.split(" ")[3]));
+        BasicNode newClient = new BasicNode(InetAddress.getByName(msg.split(" ")[2]), msg.split(" ")[4], Integer.parseInt(msg.split(" ")[3]));
         this.getClient().addNeighbour(newClient);
         String reply = "JOINOK 0";
         reply = reply.length()+" "+reply;
@@ -75,11 +76,11 @@ public class ClientServer implements Runnable {
 
     }
 
-    public Client getClient() {
+    public Node getClient() {
         return client;
     }
 
-    public void setClient(Client client) {
+    public void setClient(Node client) {
         this.client = client;
     }
 

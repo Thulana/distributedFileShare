@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.uom.cse14.client;
+package org.uom.cse14.node;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -22,7 +22,7 @@ import java.util.List;
  *
  * @author thulana
  */
-public class Client {
+public class Node extends BasicNode {
 
     private DatagramSocket socket;
     private InetAddress address;
@@ -32,20 +32,20 @@ public class Client {
     private int port;
     private DatagramChannel channel;
 
-    public Client(String userName, int port) throws UnknownHostException, SocketException, IOException {
+    public Node(String userName, int port) throws UnknownHostException, SocketException, IOException {
         socket = new DatagramSocket();
         this.channel = DatagramChannel.open();
         channel.socket().bind(new InetSocketAddress(port));
         address = InetAddress.getByName("localhost");
-        clientList = Collections.synchronizedList(new ArrayList<Client>());
+        clientList = Collections.synchronizedList(new ArrayList<BasicNode>());
         this.userName = userName;
     }
 
-    public Client(InetAddress address, String userName, int port) {
+    public Node(InetAddress address, int port) {
         this.address = address;
-        this.userName = userName;
         this.port = port;
     }
+    
 
 //    public String sendMsg(String msg, InetAddress ip, int port) throws IOException {
 //        buf = msg.getBytes();
@@ -100,7 +100,7 @@ public class Client {
         this.userName = userName;
     }
 
-    public void setClientList(ArrayList<Client> clientList) {
+    public void setClientList(ArrayList<Node> clientList) {
         this.clientList = clientList;
     }
 
@@ -112,11 +112,11 @@ public class Client {
         this.socket = socket;
     }
 
-    public void addNeighbour(Client client) {
+    public void addNeighbour(BasicNode client) {
         clientList.add(client);
     }
 
-    public void removeNeighbour(Client client) {
+    public void removeNeighbour(BasicNode client) {
         clientList.remove(client);
     }
 

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.uom.cse14.client.server;
+package org.uom.cse14.node.server;
 
 /**
  *
@@ -18,12 +18,12 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.uom.cse14.client.Client;
+import org.uom.cse14.node.Node;
 
 /**
  *
  */
-public class WorkerRunnable extends ClientServer implements Runnable {
+public class WorkerRunnable extends NodeServer implements Runnable {
 
     protected Socket clientSocket = null;
     protected String serverText = null;
@@ -33,7 +33,7 @@ public class WorkerRunnable extends ClientServer implements Runnable {
 //        this.serverText   = serverText;
 //        super(0, null);
 //    }
-    public WorkerRunnable(int port, Client client, Socket clientSocket, String msg) throws SocketException {
+    public WorkerRunnable(int port, Node client, Socket clientSocket, String msg) throws SocketException {
         super(port, client);
         this.clientSocket = clientSocket;
         this.serverText = msg;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.uom.cse14.client.util;
+package org.uom.cse14.node.util;
 
 /**
  *
