@@ -58,27 +58,33 @@ public class MsgParser {
     }
 
     public static String sendMessageParser( Object messageData,  String command){
+        String messageText =command+" ";
         switch (command){
-            case "Discover":
-                String messageText = (String)messageData;
+            case "DISCOVER":
+                messageText = (String)messageData;
                 messageText = "DISCOVER " + messageText;
                 return Integer.toString(messageText.length()+1+Integer.toString(messageText.length()).length()) +" "+messageText;
-            case "search":
-                messageText = "SEARCH";
+
+            case "SEARCH":
                 return messageText;
 
-            case "discoverResponse":
-                String nodeList = "";
+            case "R_DISCOVER":
                 boolean firstElement = true;
                 for(Object neighbour :(ArrayList)messageData){
                     BasicNode neighbourNode = (BasicNode)neighbour;
                     if (! firstElement){
-                        nodeList = nodeList+","+neighbourNode.getAddress()+":"+Integer.toString(neighbourNode.getPort());
+                        messageText = messageText + ","+neighbourNode.getAddress()+":"+Integer.toString(neighbourNode.getPort());
                     }else{
-                        nodeList = neighbourNode.getAddress()+":"+Integer.toString(neighbourNode.getPort());
+                        messageText = messageText + neighbourNode.getAddress()+":"+Integer.toString(neighbourNode.getPort());
                         firstElement = false;
                     }
                 }
+            case "LEAVE":
+                BasicNode leaveNode = (BasicNode)messageData;
+                messageText = messageText + leaveNode.getAddress()+":"+Integer.toString(leaveNode.getPort());
+
+
+
         }
 
         return null;
