@@ -5,7 +5,10 @@
  */
 package org.uom.cse14.node.discover;
 
+import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -13,6 +16,7 @@ import java.util.logging.Logger;
 
 import org.uom.cse14.node.BasicNode;
 import org.uom.cse14.node.Node;
+import org.uom.cse14.node.util.MsgParser;
 
 /**
  *
@@ -21,10 +25,15 @@ import org.uom.cse14.node.Node;
 public class NodeDiscovery implements Runnable {
     private Node node;
 
+    private DatagramSocket serverSocket;
+    private byte[] in;
+    private byte[] out;
+
     public NodeDiscovery() {
     }
 
-    public NodeDiscovery(Node node) {
+    public NodeDiscovery(Node node,int port) throws SocketException {
+        serverSocket = new DatagramSocket(port+1);
         this.node = node;
     }
     
@@ -33,7 +42,7 @@ public class NodeDiscovery implements Runnable {
         while (true) {            
             System.out.println("discovering");
             try {
-                Thread.sleep(100000);
+                Thread.sleep(10000);
 
                 for(Object neighbour :node.getClientList() ){
                     BasicNode neighbourNode = (BasicNode)neighbour;
@@ -44,25 +53,24 @@ public class NodeDiscovery implements Runnable {
 
                 List neighbourList = node.getClientList();
 
-                if (neighbourList.size() <6){
-                    int randNum = 3;
+                if ((neighbourList.size() <6) && (neighbourList.size() >1)){
+                    int randNum = (int) (Math.random() * (neighbourList.size()- 1)) + 1;
                     BasicNode selectedNeighbour = (BasicNode)neighbourList.get(randNum);
-                    this.discover(selectedNeighbour.getAddress(),selectedNeighbour.getPort());
-
-                    randNum = 1;
-                    selectedNeighbour = (BasicNode)neighbourList.get(randNum);
                     this.discover(selectedNeighbour.getAddress(),selectedNeighbour.getPort());
                 }
 
 
             } catch (InterruptedException ex) {
                 Logger.getLogger(NodeDiscovery.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    private void discover(InetAddress ipAddress, int port){
-
+    private void discover(InetAddress ipAddress, int port) throws IOException {
+        String discoverMessage = MsgParser.sendMessageParser(node.getAddress()+":"+Integer.toString(node.getPort()),"Discover");
+        node.send(ipAddress,port,discoverMessage,serverSocket);
     }
     // thread for node discovery ( target - keep active node count > 3 )
     

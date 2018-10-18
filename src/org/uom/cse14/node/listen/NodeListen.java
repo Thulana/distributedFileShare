@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+
 import org.uom.cse14.node.BasicNode;
 import org.uom.cse14.node.Node;
 import org.uom.cse14.node.util.MsgParser;
@@ -43,13 +45,14 @@ public class NodeListen implements Runnable {
 				 * Get the data from the packet we've just received
 				 * and transform it to uppercase.
                  */
-                String msg = new String(receivedPacket.getData());
+                String msg = new String(receivedPacket.getData()).trim();
+                System.out.println(msg);
                 String command = msg.split(" ")[1];
                 switch (command) {
                     case "JOIN" :
                         join(msg,receivedPacket.getAddress(),receivedPacket.getPort());
                         break;
-                    case "DISCOVERY" :
+                    case "DISCOVER" :
                         discovery(msg,receivedPacket.getAddress(),receivedPacket.getPort());
                         break;
                     case "SEARCH" :
@@ -78,9 +81,15 @@ public class NodeListen implements Runnable {
         client.send(address, port, reply);
     }
 
+    private void discoveryResponse(InetAddress ipAddress,int port) throws IOException {
+        String discoverResponse = MsgParser.sendMessageParser(this.client.getClientList(),"discoverResponse");
+        this.client.send(ipAddress,port,discoverResponse,serverSocket);
+    }
+
     private void discovery(String msg,InetAddress address,int port) {
-       Object[] response = MsgParser.messageParser(msg,"DISCOVERY");
+       Object[] response = MsgParser.receivedMessageParser(msg,"DISCOVER");
        if ((int)response[0] == 0){
+
            //update Client List
            System.out.printf("updated clients and added new clients");
 

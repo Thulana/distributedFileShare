@@ -30,7 +30,7 @@ public class NodeUI extends javax.swing.JFrame {
      */
     public NodeUI() {
         initComponents();
-        
+
     }
 
     /**
@@ -49,8 +49,8 @@ public class NodeUI extends javax.swing.JFrame {
         boostrapPortText = new javax.swing.JTextField();
         leaveBtn = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
+        query = new javax.swing.JTextField();
+        searchBtn = new javax.swing.JButton();
         joinBtn = new javax.swing.JButton();
         nodeportText = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
@@ -87,12 +87,17 @@ public class NodeUI extends javax.swing.JFrame {
 
         jLabel4.setText("Search Query :");
 
-        jButton2.setText("Search");
+        searchBtn.setText("Search");
 
         joinBtn.setText("Join");
         joinBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 joinBtnActionPerformed(evt);
+            }
+        });
+        searchBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchBtnActionPerformed(evt);
             }
         });
 
@@ -131,9 +136,9 @@ public class NodeUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton2)
+                                .addComponent(searchBtn)
                                 .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(jTextField3)))
+                            .addComponent(query)))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
@@ -189,9 +194,9 @@ public class NodeUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(query, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
+                .addComponent(searchBtn)
                 .addContainerGap())
         );
 
@@ -209,7 +214,7 @@ public class NodeUI extends javax.swing.JFrame {
             new Thread(clientServer,"nodeServer").start();
             bootstrap = new NodeBootstrap(client, InetAddress.getByName(boostrapIpText.getText()),Integer.parseInt(boostrapPortText.getText()));
             String response = bootstrap.registerClient(bootstrap.getBootstrapAddr().getHostAddress(), Integer.parseInt(nodeportText.getText()));
-            NodeDiscovery discovery = new NodeDiscovery(client);
+            NodeDiscovery discovery = new NodeDiscovery(client,Integer.parseInt(nodeportText.getText()));
             new Thread(discovery,"nodeDiscovery").start();
             consoleTextPane.append(response+"\n");
             System.out.println("response : "+response);
@@ -222,6 +227,15 @@ public class NodeUI extends javax.swing.JFrame {
             Logger.getLogger(NodeController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_joinBtnActionPerformed
+
+    private void searchBtnActionPerformed(java.awt.event.ActionEvent evt){
+
+        String fileQuery = query.getText();
+        client.search(fileQuery);
+
+
+
+    }
 
     private void usernameTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameTextActionPerformed
         // TODO add your handling code here:
@@ -288,7 +302,7 @@ public class NodeUI extends javax.swing.JFrame {
     private javax.swing.JTextField boostrapIpText;
     private javax.swing.JTextField boostrapPortText;
     private javax.swing.JTextArea consoleTextPane;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton searchBtn;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -296,7 +310,7 @@ public class NodeUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField query;
     private javax.swing.JButton joinBtn;
     private javax.swing.JButton leaveBtn;
     private javax.swing.JTextField nodeportText;
