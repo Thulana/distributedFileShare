@@ -214,7 +214,7 @@ public class NodeUI extends javax.swing.JFrame {
             new Thread(clientServer,"nodeServer").start();
             bootstrap = new NodeBootstrap(client, InetAddress.getByName(boostrapIpText.getText()),Integer.parseInt(boostrapPortText.getText()));
             String response = bootstrap.registerClient(bootstrap.getBootstrapAddr().getHostAddress(), Integer.parseInt(nodeportText.getText()));
-            NodeDiscovery discovery = new NodeDiscovery(client,Integer.parseInt(nodeportText.getText()));
+            NodeDiscovery discovery = new NodeDiscovery(client);
             new Thread(discovery,"nodeDiscovery").start();
             consoleTextPane.append(response+"\n");
             System.out.println("response : "+response);
