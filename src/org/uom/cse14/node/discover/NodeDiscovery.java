@@ -25,15 +25,13 @@ import org.uom.cse14.node.util.MsgParser;
 public class NodeDiscovery implements Runnable {
     private Node node;
 
-    private DatagramSocket serverSocket;
     private byte[] in;
     private byte[] out;
 
     public NodeDiscovery() {
     }
 
-    public NodeDiscovery(Node node,int port) throws SocketException {
-        serverSocket = new DatagramSocket(port+1);
+    public NodeDiscovery(Node node) throws SocketException {
         this.node = node;
     }
     
@@ -70,7 +68,7 @@ public class NodeDiscovery implements Runnable {
 
     private void discover(InetAddress ipAddress, int port) throws IOException {
         String discoverMessage = MsgParser.sendMessageParser(node.getAddress()+":"+Integer.toString(node.getPort()),"Discover");
-        node.send(ipAddress,port,discoverMessage,serverSocket);
+        node.send(ipAddress,port,discoverMessage);
     }
     // thread for node discovery ( target - keep active node count > 3 )
     
