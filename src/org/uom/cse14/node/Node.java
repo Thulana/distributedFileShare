@@ -5,8 +5,6 @@
  */
 package org.uom.cse14.node;
 
-import com.sun.org.apache.xerces.internal.xs.StringList;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -19,6 +17,7 @@ import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -27,7 +26,7 @@ import java.util.List;
 public class Node extends BasicNode {
 
     private DatagramSocket socket;
-    private List clientList;
+    private CopyOnWriteArrayList clientList;
     private List fileList;
 
     private byte[] buf;

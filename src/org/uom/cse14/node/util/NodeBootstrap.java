@@ -59,6 +59,23 @@ public class NodeBootstrap {
         }
         return response;
     }
+    
+    public String leaveClient(String address,int port) throws IOException{
+        String msg = "UNREG "+address+" "+port+" "+getClient().getUserName();
+        msg = msg.length()+" "+msg;
+        String response = getClient().sendMsg(msg, getBootstrapAddr(), getBootstrapPort());
+        String[] commandList = response.split(" ");
+        System.out.println(response);
+        int responsetype = Integer.parseInt(response.split(" ")[2].trim());
+        if (responsetype == 0){
+//            System.out.println("bootstrap says same user");
+            return "Successfully Leaved";
+        }else if(responsetype == 9999){
+//            System.out.println("bootstrap says no user");
+            return "Error occured";
+        }
+        return response;
+    }
 
     /**
      * @return the client
