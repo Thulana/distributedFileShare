@@ -22,12 +22,15 @@ import org.uom.cse14.node.discover.NodeDiscovery;
  * @author thulana
  */
 public class NodeUI extends javax.swing.JFrame {
-
+    Node client;
+    NodeListen clientServer;
+    NodeBootstrap bootstrap;
     /**
      * Creates new form ClientUI
      */
     public NodeUI() {
         initComponents();
+        
     }
 
     /**
@@ -76,6 +79,11 @@ public class NodeUI extends javax.swing.JFrame {
         boostrapPortText.setText("55555");
 
         leaveBtn.setText("Leave");
+        leaveBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                leaveBtnActionPerformed(evt);
+            }
+        });
 
         jLabel4.setText("Search Query :");
 
@@ -196,10 +204,10 @@ public class NodeUI extends javax.swing.JFrame {
 
     private void joinBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinBtnActionPerformed
          try {
-            Node client = new Node(usernameText.getText(),Integer.parseInt(nodeportText.getText()));
-            NodeListen clientServer = new NodeListen(Integer.parseInt(nodeportText.getText()), client);
+            client = new Node(usernameText.getText(),Integer.parseInt(nodeportText.getText()));
+            clientServer = new NodeListen(Integer.parseInt(nodeportText.getText()), client);
             new Thread(clientServer,"nodeServer").start();
-            NodeBootstrap bootstrap = new NodeBootstrap(client, InetAddress.getByName(boostrapIpText.getText()),Integer.parseInt(boostrapPortText.getText()));
+            bootstrap = new NodeBootstrap(client, InetAddress.getByName(boostrapIpText.getText()),Integer.parseInt(boostrapPortText.getText()));
             String response = bootstrap.registerClient(bootstrap.getBootstrapAddr().getHostAddress(), Integer.parseInt(nodeportText.getText()));
             NodeDiscovery discovery = new NodeDiscovery(client);
             new Thread(discovery,"nodeDiscovery").start();
@@ -222,6 +230,18 @@ public class NodeUI extends javax.swing.JFrame {
     private void boostrapIpTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boostrapIpTextActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_boostrapIpTextActionPerformed
+
+    private void leaveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_leaveBtnActionPerformed
+        try {
+            InetAddress inet = InetAddress.getLocalHost();
+            String response = bootstrap.leaveClient(inet.getHostAddress(), Integer.parseInt(nodeportText.getText()));
+            consoleTextPane.append(response+"\n");
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(NodeUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(NodeUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_leaveBtnActionPerformed
 
     /**
      * @param args the command line arguments

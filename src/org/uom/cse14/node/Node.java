@@ -17,6 +17,7 @@ import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -25,7 +26,7 @@ import java.util.List;
 public class Node extends BasicNode {
 
     private DatagramSocket socket;
-    private List clientList;
+    private CopyOnWriteArrayList clientList;
 
     private byte[] buf;
     private DatagramChannel channel;
