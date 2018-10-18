@@ -6,9 +6,11 @@
 package org.uom.cse14.node.util;
 
 
+import org.uom.cse14.node.BaseNode;
 import org.uom.cse14.node.BasicNode;
-import org.uom.cse14.node.Node;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,9 +24,17 @@ public class MsgParser {
 
 
 
+    public static Object[] receivedMessageParser( String message,  String command, BasicNode node){
+
+        System.out.printf(message);
+        System.out.printf(Integer.toString(node.getPort()));
+        return new Object[] {1,"Corrupted Message"};
+
+    }
+
     public static Object[] receivedMessageParser( String message,  String command){
         int messageLength = Integer.parseInt(message.split(" ")[0]);
-        System.out.printf(Integer.toString(messageLength));
+
         if (messageLength != message.length()){
             return new Object[] {1,"Corrupted Message"};
         }
@@ -35,15 +45,29 @@ public class MsgParser {
 
 
         switch (command){
-            case "DISCOVER":
-                ArrayList<String> ipList = new ArrayList<String>();
-                ArrayList<String> portList = new ArrayList<String>();
-
-                for(String neighbour:messageContent){
-                    ipList.add(neighbour.split(":")[0]);
-                    portList.add(neighbour.split(":")[1]);
+            case "R_DISCOVER":
+                ArrayList<InetAddress> ipList = new ArrayList<InetAddress>();
+                ArrayList<Integer> portList = new ArrayList<Integer>();
+                String[] messageSubContent = messageContent.get(0).split(",");
+                for(String neighbour:messageSubContent){
+                    try {
+                        ipList.add(InetAddress.getByName(neighbour.split(":")[0]));
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
+                    portList.add(Integer.parseInt(neighbour.split(":")[1]));
                 }
                 return new Object[] {0, "error", ipList,portList};
+
+            case "DISCOVER":
+                try {
+                    return new Object[] {0, "error", InetAddress.getByName(messageContent.get(0).split(":")[0]),Integer.parseInt(messageContent.get(0).split(":")[1])};
+
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                    return new Object[] {1,e.getMessage(), "response" };
+
+                }
 
             case "JOIN":
                 return new Object[] {0, "error", "response" };
@@ -51,10 +75,7 @@ public class MsgParser {
 
         }
 
-
-
-
-    return null;
+    return new Object[] {1, "Unknown Error" };
     }
 
     public static String sendMessageParser( Object messageData,  String command){
@@ -63,25 +84,25 @@ public class MsgParser {
             case "DISCOVER":
                 BasicNode discoverNode = (BasicNode)messageData;
                 messageText = messageText+discoverNode.getAddress().getHostAddress()+":"+Integer.toString(discoverNode.getPort());
+                break;
 
             case "SEARCH":
                 return messageText;
 
             case "R_DISCOVER":
-                boolean firstElement = true;
-                for(Object neighbour :(ArrayList)messageData){
-                    BasicNode neighbourNode = (BasicNode)neighbour;
-                    if (! firstElement){
-                        messageText = messageText + ","+neighbourNode.getAddress().getHostAddress()+":"+Integer.toString(neighbourNode.getPort());
-                    }else{
-                        messageText = messageText + neighbourNode.getAddress().getHostAddress()+":"+Integer.toString(neighbourNode.getPort());
-                        firstElement = false;
-                    }
-                }
+                BaseNode client = (BaseNode)messageData;
+                List<String> nodeList = new ArrayList<>();
+                client.getClientList().forEach((neighborKey, neighbor)->{
+                    nodeList.add(neighbor.getAddress().getHostAddress()+":"+Integer.toString(neighbor.getPort()));
+                });
+
+                messageText = messageText +String.join(",", nodeList);
+                break;
+
             case "LEAVE":
                 BasicNode leaveNode = (BasicNode)messageData;
                 messageText = messageText + leaveNode.getAddress().getHostAddress()+":"+Integer.toString(leaveNode.getPort());
-
+                break;
         }
 
         return formatMsgLength(messageText);

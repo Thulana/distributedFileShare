@@ -5,26 +5,23 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import org.uom.cse14.node.BasicNode;
-import org.uom.cse14.node.Node;
+import org.uom.cse14.node.BaseNode;
+import org.uom.cse14.node.NeighbourNode;
 import org.uom.cse14.node.util.MsgParser;
 
-//import org.apache.log4j.Logger;
+
 public class NodeListen implements Runnable {
 //	final static Logger logger = Logger.getLogger(Server.class);
 
     private DatagramSocket serverSocket;
-    private byte[] in;
-    private byte[] out;
-    private Node client;
+    private BaseNode client;
 
     /*
 	 * Our constructor which instantiates our serverSocket
      */
-    public NodeListen(int port, Node client) throws SocketException {
+    public NodeListen(int port, BaseNode client) throws SocketException {
         serverSocket = new DatagramSocket(port);
         this.client = client;
     }
@@ -32,8 +29,8 @@ public class NodeListen implements Runnable {
     public void run() {
         while (true) {
             try {
-                in = new byte[1024];
-                out = new byte[1024];
+                byte[]  in = new byte[1024];
+                //byte[] out = new byte[1024];
 
                 /*
 				 * Create our inbound datagram packet
@@ -46,14 +43,16 @@ public class NodeListen implements Runnable {
 				 * and transform it to uppercase.
                  */
                 String msg = new String(receivedPacket.getData()).trim();
-                System.out.println(msg);
                 String command = msg.split(" ")[1];
                 switch (command) {
                     case "JOIN" :
                         join(msg,receivedPacket.getAddress(),receivedPacket.getPort());
                         break;
                     case "DISCOVER" :
-                        discovery(msg,receivedPacket.getAddress(),receivedPacket.getPort());
+                        discover(msg,receivedPacket.getAddress(),receivedPacket.getPort());
+                        break;
+                    case "R_DISCOVER" :
+                        discoverResponse(msg,receivedPacket.getAddress(),receivedPacket.getPort());
                         break;
                     case "SEARCH" :
                         System.out.println("search");
@@ -73,25 +72,38 @@ public class NodeListen implements Runnable {
 
 
 
-    private void join(String msg,InetAddress address,int port ) throws UnknownHostException, IOException {
-        BasicNode newClient = new BasicNode(InetAddress.getByName(msg.split(" ")[2]), msg.split(" ")[4], Integer.parseInt(msg.split(" ")[3]));
-        this.getClient().addNeighbour(newClient);
+    private void join(String msg,InetAddress address,int port ) throws IOException {
+        NeighbourNode newClient = new NeighbourNode( msg.split(" ")[4],InetAddress.getByName(msg.split(" ")[2]), Integer.parseInt(msg.split(" ")[3]));
+        client.addNeighbour(newClient);
+
+        //Use MsgParser For this
         String reply = "JOINOK 0";
         reply = reply.length()+" "+reply;
+        //Use MsgParser For this
         client.send(address, port, reply);
     }
 
-    private void discoveryResponse(InetAddress ipAddress,int port) throws IOException {
-        String discoverResponse = MsgParser.sendMessageParser(this.client.getClientList(),"R_DISCOVER");
-        this.client.send(ipAddress,port,discoverResponse);
+    private void discover(String msg,InetAddress address,int port) throws IOException {
+        Object[] response = MsgParser.receivedMessageParser(msg,"DISCOVER");
+       if ((int)response[0] == 0){
+           appendNeighbour(client,(InetAddress) response[2],(int)response[3]);
+           String discoverResponse = MsgParser.sendMessageParser(this.client,"R_DISCOVER");
+           this.client.send((InetAddress) response[2],(int)response[3],discoverResponse);
+        }else{
+            System.out.printf("Message error");
+       }
+
     }
 
-    private void discovery(String msg,InetAddress address,int port) {
-       Object[] response = MsgParser.receivedMessageParser(msg,"DISCOVER");
-       if ((int)response[0] == 0){
-
-           //update Client List
-           System.out.printf("updated clients and added new clients");
+    private void discoverResponse(String msg,InetAddress address,int port) {
+       Object[] response = MsgParser.receivedMessageParser(msg,"R_DISCOVER");
+       String myHash = client.getAddress().getHostAddress()+Integer.toString(client.getPort());
+        if ((int)response[0] == 0){
+           ArrayList<?> addresses = (ArrayList<?>)response[2];
+           ArrayList<?> ports = (ArrayList<?>)response[3];
+           for (int i =0; i<addresses.size(); i++){
+               addNeighbour(client,(InetAddress) addresses.get(i),(Integer)(ports.get(i)),myHash);
+           }
 
        }else{
            System.out.printf("Message error");
@@ -99,12 +111,28 @@ public class NodeListen implements Runnable {
 
     }
 
-    public Node getClient() {
-        return client;
+    private void appendNeighbour(BaseNode baseNode, InetAddress ipAddress, int port){
+        String hashKey = ipAddress.getHostAddress()+Integer.toString(port);
+        if(baseNode.getClientList().containsKey(hashKey)){
+            baseNode.getClientList().get(hashKey).setRetryCount(0);
+        }else{
+            NeighbourNode neighbour = new NeighbourNode(ipAddress,port);
+            baseNode.addNeighbour(neighbour);
+        }
+
     }
 
-    public void setClient(Node client) {
-        this.client = client;
+    private void addNeighbour(BaseNode baseNode, InetAddress ipAddress, int port,String myHash){
+        String hashKey = ipAddress.getHostAddress()+Integer.toString(port);
+
+        if(!myHash.equals(hashKey)) {
+            if (!baseNode.getClientList().containsKey(hashKey)) {
+                NeighbourNode neighbour = new NeighbourNode(ipAddress, port);
+                baseNode.addNeighbour(neighbour);
+            }
+        }
+
     }
+
 
 }

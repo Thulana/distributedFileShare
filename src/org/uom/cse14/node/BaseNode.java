@@ -17,6 +17,7 @@ import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.uom.cse14.node.util.MsgParser;
 
@@ -24,26 +25,28 @@ import org.uom.cse14.node.util.MsgParser;
  *
  * @author thulana
  */
-public class Node extends BasicNode {
+public class BaseNode extends BasicNode {
 
     private DatagramSocket socket;
-    private CopyOnWriteArrayList clientList;
+
     private List fileList;
+
+    private ConcurrentHashMap<String,NeighbourNode> clientList;
 
     private byte[] buf;
     private DatagramChannel channel;
 
-    public Node(String userName, int port) throws UnknownHostException, SocketException, IOException {
+    public BaseNode(String userName, int port) throws UnknownHostException, SocketException, IOException {
         socket = new DatagramSocket();
         this.port = port;
         this.address = InetAddress.getByName("localhost");
-        clientList = new CopyOnWriteArrayList<BasicNode>();
+        clientList = new ConcurrentHashMap<>();
         fileList = new ArrayList<String>();
         this.userName = userName;
 
     }
 
-    public Node(InetAddress address, int port) {
+    public BaseNode(InetAddress address, int port) {
         this.address = address;
         this.port = port;
     }
@@ -71,10 +74,9 @@ public class Node extends BasicNode {
 
     public void search(String fileQuery){
         String fileName;
-        Node clientNode;
-        String msg = "length SER IP port file_name hops";
-        int clientNodePort;
-        InetAddress clientNodeAddress;
+        String msgtest = "length SER IP port file_name hops";
+
+
 
         for (Object obj: fileList) {
             fileName=  (String)obj;
@@ -83,20 +85,17 @@ public class Node extends BasicNode {
             }
         }
         //forward msg to clientList
-        for(Object neighbor:clientList){
-        clientNode = (Node)neighbor;
-        clientNodePort = clientNode.getPort();
-        clientNodeAddress = clientNode.getAddress();
+        clientList.forEach((neighborKey,neighbor)->{
+            int clientNodePort = neighbor.getPort();
+            InetAddress clientNodeAddress = neighbor.getAddress();
             try {
-                msg = "SER " + clientNodeAddress.getHostAddress() + " " + Integer.toString(clientNodePort)
+                String msg = "SER " + clientNodeAddress.getHostAddress() + " " + Integer.toString(clientNodePort)
                         + " " + fileQuery + " 3" ;
-                sendMsg("",clientNodeAddress,clientNodePort);
+                send(clientNodeAddress,clientNodePort,msg);
             } catch (IOException e) {
                 System.out.println("Error requesting");
             }
-
-
-        }
+        });
 
     }
 
@@ -104,35 +103,24 @@ public class Node extends BasicNode {
         socket.close();
     }
 
-    public CopyOnWriteArrayList getClientList() { return clientList; }
+    public ConcurrentHashMap<String, NeighbourNode> getClientList() { return clientList; }
 
     public DatagramSocket getSocket() {
         return socket;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public void setClientList(CopyOnWriteArrayList clientList) {
-        this.clientList = clientList;
-    }
-
-
-
-
-    //public void setAddress(InetAddress address) { this.address = address; }
-
     public void setSocket(DatagramSocket socket) {
         this.socket = socket;
     }
 
-    public void addNeighbour(BasicNode client) {
-        clientList.add(client);
+    public void addNeighbour(NeighbourNode neighbour) {
+        String hashKey = neighbour.address.getHostAddress()+Integer.toString(neighbour.port);
+        clientList.put(hashKey,neighbour);
     }
 
-    public void removeNeighbour(BasicNode client) {
-        clientList.remove(client);
+    public void removeNeighbour(NeighbourNode neighbour) {
+        String hashKey = neighbour.address.getHostAddress()+Integer.toString(neighbour.port);
+        clientList.remove(hashKey);
     }
     public void leave(){
         String msg = "LEAVE "+this.getAddress().getHostAddress()+" "+this.getPort();

@@ -12,7 +12,8 @@ package org.uom.cse14.node.listen;
 import java.net.Socket;
 import java.net.SocketException;
 
-import org.uom.cse14.node.Node;
+import org.uom.cse14.node.BaseNode;
+
 
 /**
  *
@@ -27,7 +28,7 @@ public class WorkerRunnable extends NodeListen implements Runnable {
 //        this.serverText   = serverText;
 //        super(0, null);
 //    }
-    public WorkerRunnable(int port, Node client, Socket clientSocket, String msg) throws SocketException {
+    public WorkerRunnable(int port, BaseNode client, Socket clientSocket, String msg) throws SocketException {
         super(port, client);
         this.clientSocket = clientSocket;
         this.serverText = msg;
