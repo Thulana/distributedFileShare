@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.uom.cse14.node.util.MsgParser;
 
 /**
  *
@@ -133,5 +134,11 @@ public class Node extends BasicNode {
     public void removeNeighbour(BasicNode client) {
         clientList.remove(client);
     }
-
+    public void leave(){
+        String msg = "LEAVE "+this.getAddress().getHostAddress()+" "+this.getPort();
+//        msg = MsgParser.formatMsgLength(msg.length()+4)+msg;
+        
+        
+    }
+    
 }
