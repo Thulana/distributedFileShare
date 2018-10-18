@@ -87,7 +87,7 @@ public class MsgParser {
 
         }
 
-        return null;
+        return formatMsgLength(messageText);
     }
 
     private static String formatMsgLength(String msg){
