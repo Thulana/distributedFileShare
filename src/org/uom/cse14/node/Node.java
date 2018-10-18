@@ -5,6 +5,8 @@
  */
 package org.uom.cse14.node;
 
+import com.sun.org.apache.xerces.internal.xs.StringList;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -26,6 +28,7 @@ public class Node extends BasicNode {
 
     private DatagramSocket socket;
     private List clientList;
+    private List fileList;
 
     private byte[] buf;
     private DatagramChannel channel;
@@ -36,6 +39,7 @@ public class Node extends BasicNode {
 //        channel.socket().bind(new InetSocketAddress(port));
         this.address = InetAddress.getByName("localhost");
         clientList = Collections.synchronizedList(new ArrayList<BasicNode>());
+        fileList = new ArrayList<String>();
         this.userName = userName;
 
     }
@@ -79,6 +83,37 @@ public class Node extends BasicNode {
         byte[] out = data.toUpperCase().getBytes();
         DatagramPacket sendPacket = new DatagramPacket(out, out.length, IPAddress, port);
         sendSocket.send(sendPacket);
+    }
+
+    public void search(String fileQuery){
+        String fileName;
+        Node clientNode;
+        String msg = "length SER IP port file_name hops";
+        int clientNodePort;
+        InetAddress clientNodeAddress;
+
+        for (Object obj: fileList) {
+            fileName=  (String)obj;
+           if (fileName.contains(fileQuery)){
+               System.out.println(fileName);
+            }
+        }
+        //forward msg to clientList
+        for(Object neighbor:clientList){
+        clientNode = (Node)neighbor;
+        clientNodePort = clientNode.getPort();
+        clientNodeAddress = clientNode.getAddress();
+            try {
+                msg = "SER " + clientNodeAddress.getHostAddress() + " " + Integer.toString(clientNodePort)
+                        + " " + fileQuery + " 3" ;
+                sendMsg("",clientNodeAddress,clientNodePort);
+            } catch (IOException e) {
+                System.out.println("Error requesting");
+            }
+
+
+        }
+
     }
 
     public void close() {
