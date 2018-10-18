@@ -61,9 +61,8 @@ public class MsgParser {
         String messageText =command+" ";
         switch (command){
             case "DISCOVER":
-                messageText = (String)messageData;
-                messageText = "DISCOVER " + messageText;
-                return Integer.toString(messageText.length()+1+Integer.toString(messageText.length()).length()) +" "+messageText;
+                BasicNode discoverNode = (BasicNode)messageData;
+                messageText = messageText+discoverNode.getAddress().getHostAddress()+":"+Integer.toString(discoverNode.getPort());
 
             case "SEARCH":
                 return messageText;
@@ -73,17 +72,15 @@ public class MsgParser {
                 for(Object neighbour :(ArrayList)messageData){
                     BasicNode neighbourNode = (BasicNode)neighbour;
                     if (! firstElement){
-                        messageText = messageText + ","+neighbourNode.getAddress()+":"+Integer.toString(neighbourNode.getPort());
+                        messageText = messageText + ","+neighbourNode.getAddress().getHostAddress()+":"+Integer.toString(neighbourNode.getPort());
                     }else{
-                        messageText = messageText + neighbourNode.getAddress()+":"+Integer.toString(neighbourNode.getPort());
+                        messageText = messageText + neighbourNode.getAddress().getHostAddress()+":"+Integer.toString(neighbourNode.getPort());
                         firstElement = false;
                     }
                 }
             case "LEAVE":
                 BasicNode leaveNode = (BasicNode)messageData;
-                messageText = messageText + leaveNode.getAddress()+":"+Integer.toString(leaveNode.getPort());
-
-
+                messageText = messageText + leaveNode.getAddress().getHostAddress()+":"+Integer.toString(leaveNode.getPort());
 
         }
 

@@ -82,7 +82,7 @@ public class NodeListen implements Runnable {
     }
 
     private void discoveryResponse(InetAddress ipAddress,int port) throws IOException {
-        String discoverResponse = MsgParser.sendMessageParser(this.client.getClientList(),"discoverResponse");
+        String discoverResponse = MsgParser.sendMessageParser(this.client.getClientList(),"R_DISCOVER");
         this.client.send(ipAddress,port,discoverResponse);
     }
 

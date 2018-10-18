@@ -66,7 +66,7 @@ public class NodeDiscovery implements Runnable {
     }
 
     private void discover(InetAddress ipAddress, int port) throws IOException {
-        String discoverMessage = MsgParser.sendMessageParser(node.getAddress()+":"+Integer.toString(node.getPort()),"Discover");
+        String discoverMessage = MsgParser.sendMessageParser(node,"DISCOVER");
         node.send(ipAddress,port,discoverMessage);
     }
     // thread for node discovery ( target - keep active node count > 3 )
