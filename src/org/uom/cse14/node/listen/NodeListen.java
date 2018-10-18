@@ -75,7 +75,7 @@ public class NodeListen implements Runnable {
         this.getClient().addNeighbour(newClient);
         String reply = "JOINOK 0";
         reply = reply.length()+" "+reply;
-        client.send(address, port, reply, this.serverSocket);
+        client.send(address, port, reply);
     }
 
     private void discovery(String msg,InetAddress address,int port) {

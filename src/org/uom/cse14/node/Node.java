@@ -76,10 +76,10 @@ public class Node extends BasicNode {
         return response;
     }
 
-    public void send(InetAddress IPAddress, int port, String data ,DatagramSocket sendSocket) throws IOException {
+    public void send(InetAddress IPAddress, int port, String data ) throws IOException {
         byte[] out = data.toUpperCase().getBytes();
         DatagramPacket sendPacket = new DatagramPacket(out, out.length, IPAddress, port);
-        sendSocket.send(sendPacket);
+        socket.send(sendPacket);
     }
 
     public void close() {
