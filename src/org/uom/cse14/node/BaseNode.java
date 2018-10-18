@@ -123,8 +123,8 @@ public class BaseNode extends BasicNode {
         clientList.remove(hashKey);
     }
     public void leave(){
-        String msg = "LEAVE "+this.getAddress().getHostAddress()+" "+this.getPort();
-//        msg = MsgParser.formatMsgLength(msg.length()+4)+msg;
+        String msg = MsgParser.sendMessageParser(this, "LEAVE");
+        System.out.println(msg);
         
         
     }
