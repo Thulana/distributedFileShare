@@ -17,6 +17,7 @@ import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -25,7 +26,8 @@ import java.util.List;
 public class Node extends BasicNode {
 
     private DatagramSocket socket;
-    private List clientList;
+    private CopyOnWriteArrayList clientList;
+    private List fileList;
 
     private byte[] buf;
     private DatagramChannel channel;
@@ -34,7 +36,8 @@ public class Node extends BasicNode {
         socket = new DatagramSocket();
         this.port = port;
         this.address = InetAddress.getByName("localhost");
-        clientList = Collections.synchronizedList(new ArrayList<BasicNode>());
+        clientList = new CopyOnWriteArrayList<BasicNode>();
+        fileList = new ArrayList<String>();
         this.userName = userName;
 
     }
@@ -65,11 +68,42 @@ public class Node extends BasicNode {
         sendSocket.send(sendPacket);
     }
 
+    public void search(String fileQuery){
+        String fileName;
+        Node clientNode;
+        String msg = "length SER IP port file_name hops";
+        int clientNodePort;
+        InetAddress clientNodeAddress;
+
+        for (Object obj: fileList) {
+            fileName=  (String)obj;
+           if (fileName.contains(fileQuery)){
+               System.out.println(fileName);
+            }
+        }
+        //forward msg to clientList
+        for(Object neighbor:clientList){
+        clientNode = (Node)neighbor;
+        clientNodePort = clientNode.getPort();
+        clientNodeAddress = clientNode.getAddress();
+            try {
+                msg = "SER " + clientNodeAddress.getHostAddress() + " " + Integer.toString(clientNodePort)
+                        + " " + fileQuery + " 3" ;
+                sendMsg("",clientNodeAddress,clientNodePort);
+            } catch (IOException e) {
+                System.out.println("Error requesting");
+            }
+
+
+        }
+
+    }
+
     public void close() {
         socket.close();
     }
 
-    public List getClientList() { return clientList; }
+    public CopyOnWriteArrayList getClientList() { return clientList; }
 
     public DatagramSocket getSocket() {
         return socket;
@@ -79,9 +113,12 @@ public class Node extends BasicNode {
         this.userName = userName;
     }
 
-    public void setClientList(ArrayList<Node> clientList) {
+    public void setClientList(CopyOnWriteArrayList clientList) {
         this.clientList = clientList;
     }
+
+
+
 
     //public void setAddress(InetAddress address) { this.address = address; }
 
