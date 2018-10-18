@@ -67,6 +67,9 @@ public class MsgParser {
         return null;
     }
 
-
+    private static String formatMsgLength(String msg){
+        String formatted = String.format("%04d", msg.length()+5)+" "+msg;
+        return formatted;
+    }
     
 }
