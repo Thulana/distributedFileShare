@@ -24,7 +24,6 @@ import org.uom.cse14.node.util.MsgParser;
  */
 public class NodeDiscovery implements Runnable {
     private Node node;
-
     private byte[] in;
     private byte[] out;
 

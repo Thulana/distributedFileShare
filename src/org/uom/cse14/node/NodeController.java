@@ -29,7 +29,7 @@ public class NodeController {
             new Thread(clientServer,"nodeServer").start();
             NodeBootstrap bootstrap = new NodeBootstrap(client, InetAddress.getByName(NodeController.bootstrapIP),NodeController.bootstrapPort );
             String response = bootstrap.registerClient(bootstrapIP, 2236);
-            NodeDiscovery discovery = new NodeDiscovery(client,3546);
+            NodeDiscovery discovery = new NodeDiscovery(client);
             new Thread(discovery,"nodeDiscovery").start();
             
             System.out.println("response : "+response);
