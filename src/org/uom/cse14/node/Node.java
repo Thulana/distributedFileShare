@@ -36,7 +36,7 @@ public class Node extends BasicNode {
 //        this.channel = DatagramChannel.open();
 //        channel.socket().bind(new InetSocketAddress(port));
         this.address = InetAddress.getByName("localhost");
-        clientList = Collections.synchronizedList(new ArrayList<BasicNode>());
+        clientList = new CopyOnWriteArrayList<BasicNode>(); 
         this.userName = userName;
 
     }
@@ -86,7 +86,7 @@ public class Node extends BasicNode {
         socket.close();
     }
 
-    public List getClientList() { return clientList; }
+    public CopyOnWriteArrayList getClientList() { return clientList; }
 
     public DatagramSocket getSocket() {
         return socket;
@@ -96,9 +96,12 @@ public class Node extends BasicNode {
         this.userName = userName;
     }
 
-    public void setClientList(ArrayList<Node> clientList) {
+    public void setClientList(CopyOnWriteArrayList clientList) {
         this.clientList = clientList;
     }
+
+    
+   
 
     //public void setAddress(InetAddress address) { this.address = address; }
 
