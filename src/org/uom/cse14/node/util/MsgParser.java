@@ -6,6 +6,9 @@
 package org.uom.cse14.node.util;
 
 
+import org.uom.cse14.node.BasicNode;
+import org.uom.cse14.node.Node;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.List;
  * @author thulana
  */
 public class MsgParser {
+
 
 
 
@@ -53,15 +57,28 @@ public class MsgParser {
     return null;
     }
 
-    public static String sendMessageParser( Object message,  String command){
+    public static String sendMessageParser( Object messageData,  String command){
         switch (command){
             case "Discover":
-                String messageText = (String)message;
+                String messageText = (String)messageData;
                 messageText = "DISCOVER " + messageText;
                 return Integer.toString(messageText.length()+1+Integer.toString(messageText.length()).length()) +" "+messageText;
             case "search":
                 messageText = "SEARCH";
                 return messageText;
+
+            case "discoverResponse":
+                String nodeList = "";
+                boolean firstElement = true;
+                for(Object neighbour :(ArrayList)messageData){
+                    BasicNode neighbourNode = (BasicNode)neighbour;
+                    if (! firstElement){
+                        nodeList = nodeList+","+neighbourNode.getAddress()+":"+Integer.toString(neighbourNode.getPort());
+                    }else{
+                        nodeList = neighbourNode.getAddress()+":"+Integer.toString(neighbourNode.getPort());
+                        firstElement = false;
+                    }
+                }
         }
 
         return null;
