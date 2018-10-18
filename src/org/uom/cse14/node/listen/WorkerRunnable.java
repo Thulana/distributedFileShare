@@ -3,27 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.uom.cse14.node.server;
+package org.uom.cse14.node.listen;
 
 /**
  *
  * @author thulana
  */
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.uom.cse14.node.Node;
 
 /**
  *
  */
-public class WorkerRunnable extends NodeServer implements Runnable {
+public class WorkerRunnable extends NodeListen implements Runnable {
 
     protected Socket clientSocket = null;
     protected String serverText = null;

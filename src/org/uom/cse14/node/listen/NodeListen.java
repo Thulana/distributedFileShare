@@ -1,4 +1,4 @@
-package org.uom.cse14.node.server;
+package org.uom.cse14.node.listen;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -8,9 +8,10 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import org.uom.cse14.node.BasicNode;
 import org.uom.cse14.node.Node;
+import org.uom.cse14.node.util.MsgParser;
 
 //import org.apache.log4j.Logger;
-public class NodeServer implements Runnable {
+public class NodeListen implements Runnable {
 //	final static Logger logger = Logger.getLogger(Server.class);
 
     private DatagramSocket serverSocket;
@@ -21,7 +22,7 @@ public class NodeServer implements Runnable {
     /*
 	 * Our constructor which instantiates our serverSocket
      */
-    public NodeServer(int port, Node client) throws SocketException {
+    public NodeListen(int port, Node client) throws SocketException {
         serverSocket = new DatagramSocket(port);
         this.client = client;
     }
@@ -44,10 +45,17 @@ public class NodeServer implements Runnable {
                  */
                 String msg = new String(receivedPacket.getData());
                 String command = msg.split(" ")[1];
-                if (command.equals("JOIN")) {
-                    join(msg,receivedPacket.getAddress(),receivedPacket.getPort());
-                }else if (command.equals("SEARCH")){
-                    System.out.println("search");
+                switch (command) {
+                    case "JOIN" :
+                        join(msg,receivedPacket.getAddress(),receivedPacket.getPort());
+                        break;
+                    case "DISCOVERY" :
+                        discovery(msg,receivedPacket.getAddress(),receivedPacket.getPort());
+                        break;
+                    case "SEARCH" :
+                        System.out.println("search");
+                        break;
+
                 }
             } catch (IOException e) {
                 /*
@@ -60,19 +68,25 @@ public class NodeServer implements Runnable {
         }
     }
 
-    public void send(InetAddress IPAddress, int port, String data) throws IOException {
-        out = data.toUpperCase().getBytes();
-        DatagramPacket sendPacket = new DatagramPacket(out, out.length, IPAddress, port);
-        serverSocket.send(sendPacket);
-    }
 
-    public void join(String msg,InetAddress address,int port ) throws UnknownHostException, IOException {
+
+    private void join(String msg,InetAddress address,int port ) throws UnknownHostException, IOException {
         BasicNode newClient = new BasicNode(InetAddress.getByName(msg.split(" ")[2]), msg.split(" ")[4], Integer.parseInt(msg.split(" ")[3]));
         this.getClient().addNeighbour(newClient);
         String reply = "JOINOK 0";
         reply = reply.length()+" "+reply;
-        this.send(address, port, reply);
-        
+        client.send(address, port, reply, this.serverSocket);
+    }
+
+    private void discovery(String msg,InetAddress address,int port) {
+       Object[] response = MsgParser.messageParser(msg,"DISCOVERY");
+       if ((int)response[0] == 0){
+           //update Client List
+           System.out.printf("updated clients and added new clients");
+
+       }else{
+           System.out.printf("Message error");
+       }
 
     }
 

@@ -13,10 +13,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.uom.cse14.node.Node;
 import org.uom.cse14.node.NodeController;
-import static org.uom.cse14.node.NodeController.bootstrapIP;
-import org.uom.cse14.node.server.NodeServer;
+import org.uom.cse14.node.listen.NodeListen;
 import org.uom.cse14.node.util.NodeBootstrap;
-import org.uom.cse14.node.util.NodeDiscovery;
+import org.uom.cse14.node.discover.NodeDiscovery;
 
 /**
  *
@@ -198,7 +197,7 @@ public class NodeUI extends javax.swing.JFrame {
     private void joinBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinBtnActionPerformed
          try {
             Node client = new Node(usernameText.getText(),Integer.parseInt(nodeportText.getText()));
-            NodeServer clientServer = new NodeServer(Integer.parseInt(nodeportText.getText()), client);
+            NodeListen clientServer = new NodeListen(Integer.parseInt(nodeportText.getText()), client);
             new Thread(clientServer,"nodeServer").start();
             NodeBootstrap bootstrap = new NodeBootstrap(client, InetAddress.getByName(boostrapIpText.getText()),Integer.parseInt(boostrapPortText.getText()));
             String response = bootstrap.registerClient(bootstrap.getBootstrapAddr().getHostAddress(), Integer.parseInt(nodeportText.getText()));
@@ -229,7 +228,7 @@ public class NodeUI extends javax.swing.JFrame {
      */
     public static void main(String args[]) {
         Node client ;
-        NodeServer clientServer;
+        NodeListen clientServer;
         NodeBootstrap bootstrap;  
         NodeDiscovery discovery;
         

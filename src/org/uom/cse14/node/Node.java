@@ -25,20 +25,19 @@ import java.util.List;
 public class Node extends BasicNode {
 
     private DatagramSocket socket;
-    private InetAddress address;
-    private String userName;
     private List clientList;
+
     private byte[] buf;
-    private int port;
     private DatagramChannel channel;
 
     public Node(String userName, int port) throws UnknownHostException, SocketException, IOException {
         socket = new DatagramSocket();
 //        this.channel = DatagramChannel.open();
 //        channel.socket().bind(new InetSocketAddress(port));
-        address = InetAddress.getByName("localhost");
+        this.address = InetAddress.getByName("localhost");
         clientList = Collections.synchronizedList(new ArrayList<BasicNode>());
         this.userName = userName;
+
     }
 
     public Node(InetAddress address, int port) {
@@ -76,21 +75,17 @@ public class Node extends BasicNode {
         return response;
     }
 
+    public void send(InetAddress IPAddress, int port, String data ,DatagramSocket sendSocket) throws IOException {
+        byte[] out = data.toUpperCase().getBytes();
+        DatagramPacket sendPacket = new DatagramPacket(out, out.length, IPAddress, port);
+        sendSocket.send(sendPacket);
+    }
+
     public void close() {
         socket.close();
     }
 
-    public List getClientList() {
-        return clientList;
-    }
-
-    public InetAddress getAddress() {
-        return address;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
+    public List getClientList() { return clientList; }
 
     public DatagramSocket getSocket() {
         return socket;
@@ -104,9 +99,7 @@ public class Node extends BasicNode {
         this.clientList = clientList;
     }
 
-    public void setAddress(InetAddress address) {
-        this.address = address;
-    }
+    //public void setAddress(InetAddress address) { this.address = address; }
 
     public void setSocket(DatagramSocket socket) {
         this.socket = socket;

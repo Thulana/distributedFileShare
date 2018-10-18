@@ -11,9 +11,9 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.uom.cse14.node.server.NodeServer;
+import org.uom.cse14.node.listen.NodeListen;
 import org.uom.cse14.node.util.NodeBootstrap;
-import org.uom.cse14.node.util.NodeDiscovery;
+import org.uom.cse14.node.discover.NodeDiscovery;
 
 /**
  *
@@ -25,7 +25,7 @@ public class NodeController {
     public static void main(String[] args) {
         try {
             Node client = new Node("testClient2",2237);
-            NodeServer clientServer = new NodeServer(2236, client);
+            NodeListen clientServer = new NodeListen(2236, client);
             new Thread(clientServer,"nodeServer").start();
             NodeBootstrap bootstrap = new NodeBootstrap(client, InetAddress.getByName(NodeController.bootstrapIP),NodeController.bootstrapPort );
             String response = bootstrap.registerClient(bootstrapIP, 2236);

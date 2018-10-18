@@ -14,9 +14,10 @@ import java.util.List;
  */
 public class BasicNode {
 
-    private InetAddress address;
-    private String userName;
-    private int port;
+    protected InetAddress address;
+    protected String userName;
+    protected int port;
+    private int retryCount;
 
     public BasicNode() {
     }
@@ -25,11 +26,25 @@ public class BasicNode {
         this.address = address;
         this.userName = userName;
         this.port = port;
+        this.retryCount = 0;
     }
 
     public BasicNode(InetAddress address, int port) {
         this.address = address;
         this.port = port;
+        this.retryCount = 0;
     }
-    
+
+    public  void setRetryCount (int retryCount){this.retryCount = retryCount; }
+    public  int getRetryCount() {return retryCount; }
+
+    public InetAddress getAddress() {
+        return address;
+    }
+    public String getUserName() {
+        return userName;
+    }
+    public int getPort(){return port;}
+
+
 }
