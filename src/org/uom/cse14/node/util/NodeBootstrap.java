@@ -68,12 +68,15 @@ public class NodeBootstrap {
         System.out.println(response);
         int responsetype = Integer.parseInt(response.split(" ")[2].trim());
         if (responsetype == 0){
+             client.leave();
 //            System.out.println("bootstrap says same user");
             return "Successfully Leaved";
+            
         }else if(responsetype == 9999){
 //            System.out.println("bootstrap says no user");
             return "Error occured";
         }
+
         return response;
     }
 

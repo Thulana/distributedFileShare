@@ -135,8 +135,8 @@ public class Node extends BasicNode {
         clientList.remove(client);
     }
     public void leave(){
-        String msg = "LEAVE "+this.getAddress().getHostAddress()+" "+this.getPort();
-//        msg = MsgParser.formatMsgLength(msg.length()+4)+msg;
+        String msg = MsgParser.sendMessageParser(this, "LEAVE");
+        System.out.println(msg);
         
         
     }
