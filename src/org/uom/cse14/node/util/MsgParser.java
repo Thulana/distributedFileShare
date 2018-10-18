@@ -5,8 +5,6 @@
  */
 package org.uom.cse14.node.util;
 
-import org.jetbrains.annotations.NotNull;
-
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +18,7 @@ public class MsgParser {
 
 
 
-    public static Object[] receivedMessageParser(@NotNull String message, @NotNull String command){
+    public static Object[] receivedMessageParser( String message,  String command){
         int messageLength = Integer.parseInt(message.split(" ")[0]);
         System.out.printf(Integer.toString(messageLength));
         if (messageLength != message.length()){
@@ -55,7 +53,7 @@ public class MsgParser {
     return null;
     }
 
-    public static String sendMessageParser(@NotNull Object message, @NotNull String command){
+    public static String sendMessageParser( Object message,  String command){
         switch (command){
             case "Discover":
                 String messageText = (String)message;
