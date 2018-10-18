@@ -7,7 +7,10 @@ package org.uom.cse14.node.util;
 
 import org.jetbrains.annotations.NotNull;
 
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -17,18 +20,24 @@ public class MsgParser {
 
 
 
-    public static Object[] messageParser(@NotNull String message, @NotNull String command){
+    public static Object[] receivedMessageParser(@NotNull String message, @NotNull String command){
         int messageLength = Integer.parseInt(message.split(" ")[0]);
+        System.out.printf(Integer.toString(messageLength));
         if (messageLength != message.length()){
             return new Object[] {1,"Corrupted Message"};
         }
-        String messageContent = message.split(" ")[1];
+
+        String[] messageItems = message.split(" ");
+        List<String> messageContent = Arrays.asList(messageItems).subList(2,messageItems.length);
+
+
+
         switch (command){
-            case "DISCOVERY":
+            case "DISCOVER":
                 ArrayList<String> ipList = new ArrayList<String>();
                 ArrayList<String> portList = new ArrayList<String>();
-                String[] neighbours =  messageContent.split(",");
-                for(String neighbour:neighbours){
+
+                for(String neighbour:messageContent){
                     ipList.add(neighbour.split(":")[0]);
                     portList.add(neighbour.split(":")[1]);
                 }
@@ -36,10 +45,28 @@ public class MsgParser {
 
             case "JOIN":
                 return new Object[] {0, "error", "response" };
+
+
         }
 
 
+
+
     return null;
+    }
+
+    public static String sendMessageParser(@NotNull Object message, @NotNull String command){
+        switch (command){
+            case "Discover":
+                String messageText = (String)message;
+                messageText = "DISCOVER " + messageText;
+                return Integer.toString(messageText.length()+1+Integer.toString(messageText.length()).length()) +" "+messageText;
+            case "search":
+                messageText = "SEARCH";
+                return messageText;
+        }
+
+        return null;
     }
 
 

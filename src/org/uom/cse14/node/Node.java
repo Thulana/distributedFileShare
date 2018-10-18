@@ -32,8 +32,7 @@ public class Node extends BasicNode {
 
     public Node(String userName, int port) throws UnknownHostException, SocketException, IOException {
         socket = new DatagramSocket();
-//        this.channel = DatagramChannel.open();
-//        channel.socket().bind(new InetSocketAddress(port));
+        this.port = port;
         this.address = InetAddress.getByName("localhost");
         clientList = Collections.synchronizedList(new ArrayList<BasicNode>());
         this.userName = userName;
@@ -45,21 +44,6 @@ public class Node extends BasicNode {
         this.port = port;
     }
     
-
-//    public String sendMsg(String msg, InetAddress ip, int port) throws IOException {
-//        buf = msg.getBytes();
-//        ByteBuffer buffer = ByteBuffer.allocate(48);
-//        buffer.clear();
-//        buffer.put(msg.getBytes());
-//        buffer.flip();
-//        int bytesSent = channel.send(buffer, new InetSocketAddress(ip, port));
-//        buffer.clear();
-//        channel.receive(buffer);
-//        return buffer.array().;
-////        String received = new String(
-////                packet.getData(), 0, packet.getLength());
-////        return received;
-//    }
 
     public String sendMsg(String msg, InetAddress ip, int port) throws IOException {
         DatagramSocket clientSocket = socket;
