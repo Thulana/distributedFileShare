@@ -52,8 +52,9 @@ public class NodeListen implements Runnable {
                     case "DISCOVERY" :
                         discovery(msg,receivedPacket.getAddress(),receivedPacket.getPort());
                         break;
-                    case "SEARCH" :
+                    case "SER" :
                         System.out.println("search");
+                        //search(msg);
                         break;
 
                 }
@@ -88,6 +89,15 @@ public class NodeListen implements Runnable {
            System.out.printf("Message error");
        }
 
+    }
+
+    private void search(String msg , InetAddress address , int port) throws IOException {
+        String fileQuery = msg.split(" ")[4];
+        int hops = Integer.parseInt(msg.split(" ")[5]) - 1;
+        this.client.search(fileQuery , hops);
+        String reply = "SEROK 0"; //added temporary
+        reply = reply.length() + reply;
+        client.send(address,port,reply,this.serverSocket);
     }
 
     public Node getClient() {
