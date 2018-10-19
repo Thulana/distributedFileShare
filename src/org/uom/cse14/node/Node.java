@@ -84,30 +84,33 @@ public class Node extends BasicNode {
         sendSocket.send(sendPacket);
     }
 
-    public void search(String fileQuery){
+    public void search(String fileQuery , int hops){
         String fileName;
         Node clientNode;
-        String msg = "length SER IP port file_name hops";
+        String msg;
         int clientNodePort;
         InetAddress clientNodeAddress;
 
         for (Object obj: fileList) {
-            fileName=  (String)obj;
+            fileName =  (String)obj;
            if (fileName.contains(fileQuery)){
                System.out.println(fileName);
             }
         }
-        //forward msg to clientList
+
+        //send the founded fileList to originated client
+
+        //forward msg to clientList depending on number of hops
         for(Object neighbor:clientList){
         clientNode = (Node)neighbor;
         clientNodePort = clientNode.getPort();
         clientNodeAddress = clientNode.getAddress();
             try {
-                msg = "SER " + clientNodeAddress.getHostAddress() + " " + Integer.toString(clientNodePort)
-                        + " " + fileQuery + " 3" ;
-                sendMsg("",clientNodeAddress,clientNodePort);
+                msg = " SER " + address.getHostAddress() + " " + port + " " + fileQuery + " " + hops ;
+                msg = msg.length() + msg;
+                sendMsg(msg, clientNodeAddress, clientNodePort);
             } catch (IOException e) {
-                System.out.println("Error requesting");
+                System.out.println("Error search forward"+ e);
             }
 
 
