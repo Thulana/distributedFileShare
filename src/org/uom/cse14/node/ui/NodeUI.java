@@ -231,7 +231,7 @@ public class NodeUI extends javax.swing.JFrame {
     private void searchBtnActionPerformed(java.awt.event.ActionEvent evt){
 
         String fileQuery = query.getText();
-        client.search(fileQuery);
+        client.search(fileQuery , 3);
 
 
 
