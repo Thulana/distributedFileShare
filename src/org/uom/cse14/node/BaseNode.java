@@ -9,16 +9,12 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import org.uom.cse14.node.util.MsgParser;
 
 /**
@@ -74,10 +70,6 @@ public class BaseNode extends BasicNode {
 
     public void search(String fileQuery , int hops){
         String fileName;
-        Node clientNode;
-        String msg;
-        int clientNodePort;
-        InetAddress clientNodeAddress;
 
         for (Object obj: fileList) {
             fileName =  (String)obj;
@@ -86,21 +78,11 @@ public class BaseNode extends BasicNode {
             }
         }
 
-        //send the founded fileList to originated client
-
-        //forward msg to clientList depending on number of hops
-        for(Object neighbor:clientList){
-        clientNode = (Node)neighbor;
-        clientNodePort = clientNode.getPort();
-        clientNodeAddress = clientNode.getAddress();
-        //forward msg to clientList
         clientList.forEach((neighborKey,neighbor)->{
-            int clientNodePort = neighbor.getPort();
-            InetAddress clientNodeAddress = neighbor.getAddress();
             try {
-                msg = " SER " + address.getHostAddress() + " " + port + " " + fileQuery + " " + hops ;
-                msg = msg.length() + msg;
-                sendMsg(msg, clientNodeAddress, clientNodePort);
+                String msg = address.getHostAddress() + " " + port + " " + fileQuery + " " + hops ;
+                msg = MsgParser.sendMessageParser(msg, "SER");
+                sendMsg(msg, neighbor.getAddress(), neighbor.getPort());
             } catch (IOException e) {
                 System.out.println("Error search forward"+ e);
             }
