@@ -1,26 +1,12 @@
 package org.uom.cse14.FileServer;
 
 import java.io.*;
-import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 public class FileServer implements FileInterface {
-    public static void main(String argv[]) throws IOException {
-
-       /* if(System.getSecurityManager() == null) {
-            System.setProperty("java.security.policy","file:/media/pasindu/newvolume/distributedFileShare/src/org/uom/cse14/FileServer/policy.txt");
-
-            System.setSecurityManager(new RMISecurityManager());
-        }*/
-    /*    try {
-            FileInterface fi = new FileImpl("FileServer");
-            Naming.rebind("//localhost:1024/Hello", fi);
-        } catch(Exception e) {
-            System.out.println("FileServer: "+e.getMessage());
-            e.printStackTrace();
-        }*/
+    public static void main(String argv[]) {
 
     try{
         System.setProperty("java.rmi.server.hostname","192.168.8.102");
