@@ -7,28 +7,30 @@ package org.uom.cse14.node.util;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import org.uom.cse14.node.BasicNode;
-import org.uom.cse14.node.Node;
+
+import org.uom.cse14.node.BaseNode;
+import org.uom.cse14.node.NeighbourNode;
+
 
 /**
  *
  * @author thulana
  */
 public class NodeBootstrap {
-    private Node client;
+    private BaseNode client;
     private InetAddress BootstrapAddr;
     private int BootstrapPort;
 
-    public NodeBootstrap(Node client) {
+    public NodeBootstrap(BaseNode client) {
         this.client = client;
     }
 
-    public NodeBootstrap(Node client, InetAddress BootstrapAddr) {
+    public NodeBootstrap(BaseNode client, InetAddress BootstrapAddr) {
         this.client = client;
         this.BootstrapAddr = BootstrapAddr;
     }
 
-    public NodeBootstrap(Node client, InetAddress BootstrapAddr, int BootstrapPort) {
+    public NodeBootstrap(BaseNode client, InetAddress BootstrapAddr, int BootstrapPort) {
         this.client = client;
         this.BootstrapAddr = BootstrapAddr;
         this.BootstrapPort = BootstrapPort;
@@ -49,12 +51,12 @@ public class NodeBootstrap {
 //            System.out.println("bootstrap says no user");
             return "bootstrap says no user";
         }else if(responsetype == 1){
-            BasicNode client = new BasicNode(InetAddress.getByName(commandList[commandList.length-2].trim()), Integer.parseInt(commandList[commandList.length-1].trim()));
+            NeighbourNode client = new NeighbourNode(InetAddress.getByName(commandList[commandList.length-2].trim()), Integer.parseInt(commandList[commandList.length-1].trim()));
             this.getClient().addNeighbour(client);
         }else if(responsetype == 2){
-            BasicNode client = new BasicNode(InetAddress.getByName(commandList[commandList.length-2].trim()), Integer.parseInt(commandList[commandList.length-1].trim()));
+            NeighbourNode client = new NeighbourNode(InetAddress.getByName(commandList[commandList.length-2].trim()), Integer.parseInt(commandList[commandList.length-1].trim()));
             this.getClient().addNeighbour(client);
-            client = new BasicNode(InetAddress.getByName(commandList[commandList.length-4].trim()), Integer.parseInt(commandList[commandList.length-3].trim()));
+            client = new NeighbourNode(InetAddress.getByName(commandList[commandList.length-4].trim()), Integer.parseInt(commandList[commandList.length-3].trim()));
             this.getClient().addNeighbour(client);
         }
         return response;
@@ -68,26 +70,29 @@ public class NodeBootstrap {
         System.out.println(response);
         int responsetype = Integer.parseInt(response.split(" ")[2].trim());
         if (responsetype == 0){
+             client.leave();
 //            System.out.println("bootstrap says same user");
             return "Successfully Leaved";
+            
         }else if(responsetype == 9999){
 //            System.out.println("bootstrap says no user");
             return "Error occured";
         }
+
         return response;
     }
 
     /**
      * @return the client
      */
-    public Node getClient() {
+    public BaseNode getClient() {
         return client;
     }
 
     /**
      * @param client the client to set
      */
-    public void setClient(Node client) {
+    public void setClient(BaseNode client) {
         this.client = client;
     }
 

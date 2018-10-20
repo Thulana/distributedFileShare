@@ -17,52 +17,40 @@ import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.uom.cse14.node.util.MsgParser;
 
 /**
  *
  * @author thulana
  */
-public class Node extends BasicNode {
+public class BaseNode extends BasicNode {
 
     private DatagramSocket socket;
-    private CopyOnWriteArrayList clientList;
+
     private List fileList;
+
+    private ConcurrentHashMap<String,NeighbourNode> clientList;
 
     private byte[] buf;
     private DatagramChannel channel;
 
-    public Node(String userName, int port) throws UnknownHostException, SocketException, IOException {
+    public BaseNode(String userName, int port) throws UnknownHostException, SocketException, IOException {
         socket = new DatagramSocket();
-//        this.channel = DatagramChannel.open();
-//        channel.socket().bind(new InetSocketAddress(port));
+        this.port = port;
         this.address = InetAddress.getByName("localhost");
-        clientList = new CopyOnWriteArrayList<BasicNode>();
+        clientList = new ConcurrentHashMap<>();
         fileList = new ArrayList<String>();
         this.userName = userName;
 
     }
 
-    public Node(InetAddress address, int port) {
+    public BaseNode(InetAddress address, int port) {
         this.address = address;
         this.port = port;
     }
     
-
-//    public String sendMsg(String msg, InetAddress ip, int port) throws IOException {
-//        buf = msg.getBytes();
-//        ByteBuffer buffer = ByteBuffer.allocate(48);
-//        buffer.clear();
-//        buffer.put(msg.getBytes());
-//        buffer.flip();
-//        int bytesSent = channel.send(buffer, new InetSocketAddress(ip, port));
-//        buffer.clear();
-//        channel.receive(buffer);
-//        return buffer.array().;
-////        String received = new String(
-////                packet.getData(), 0, packet.getLength());
-////        return received;
-//    }
 
     public String sendMsg(String msg, InetAddress ip, int port) throws IOException {
         DatagramSocket clientSocket = socket;
@@ -78,10 +66,10 @@ public class Node extends BasicNode {
         return response;
     }
 
-    public void send(InetAddress IPAddress, int port, String data ,DatagramSocket sendSocket) throws IOException {
+    public void send(InetAddress IPAddress, int port, String data ) throws IOException {
         byte[] out = data.toUpperCase().getBytes();
         DatagramPacket sendPacket = new DatagramPacket(out, out.length, IPAddress, port);
-        sendSocket.send(sendPacket);
+        socket.send(sendPacket);
     }
 
     public void search(String fileQuery , int hops){
@@ -105,6 +93,10 @@ public class Node extends BasicNode {
         clientNode = (Node)neighbor;
         clientNodePort = clientNode.getPort();
         clientNodeAddress = clientNode.getAddress();
+        //forward msg to clientList
+        clientList.forEach((neighborKey,neighbor)->{
+            int clientNodePort = neighbor.getPort();
+            InetAddress clientNodeAddress = neighbor.getAddress();
             try {
                 msg = " SER " + address.getHostAddress() + " " + port + " " + fileQuery + " " + hops ;
                 msg = msg.length() + msg;
@@ -112,9 +104,7 @@ public class Node extends BasicNode {
             } catch (IOException e) {
                 System.out.println("Error search forward"+ e);
             }
-
-
-        }
+        });
 
     }
 
@@ -122,35 +112,30 @@ public class Node extends BasicNode {
         socket.close();
     }
 
-    public CopyOnWriteArrayList getClientList() { return clientList; }
+    public ConcurrentHashMap<String, NeighbourNode> getClientList() { return clientList; }
 
     public DatagramSocket getSocket() {
         return socket;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public void setClientList(CopyOnWriteArrayList clientList) {
-        this.clientList = clientList;
-    }
-
-
-
-
-    //public void setAddress(InetAddress address) { this.address = address; }
-
     public void setSocket(DatagramSocket socket) {
         this.socket = socket;
     }
 
-    public void addNeighbour(BasicNode client) {
-        clientList.add(client);
+    public void addNeighbour(NeighbourNode neighbour) {
+        String hashKey = neighbour.address.getHostAddress()+Integer.toString(neighbour.port);
+        clientList.put(hashKey,neighbour);
     }
 
-    public void removeNeighbour(BasicNode client) {
-        clientList.remove(client);
+    public void removeNeighbour(NeighbourNode neighbour) {
+        String hashKey = neighbour.address.getHostAddress()+Integer.toString(neighbour.port);
+        clientList.remove(hashKey);
+    }
+    public void leave(){
+        String msg = MsgParser.sendMessageParser(this, "LEAVE");
+        System.out.println(msg);
+
+
     }
 
 }

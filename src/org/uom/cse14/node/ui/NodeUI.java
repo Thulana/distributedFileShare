@@ -11,7 +11,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.uom.cse14.node.Node;
+import org.uom.cse14.node.BaseNode;
 import org.uom.cse14.node.NodeController;
 import org.uom.cse14.node.listen.NodeListen;
 import org.uom.cse14.node.util.NodeBootstrap;
@@ -22,9 +22,10 @@ import org.uom.cse14.node.discover.NodeDiscovery;
  * @author thulana
  */
 public class NodeUI extends javax.swing.JFrame {
-    Node client;
+    BaseNode client;
     NodeListen clientServer;
     NodeBootstrap bootstrap;
+
     /**
      * Creates new form ClientUI
      */
@@ -209,7 +210,8 @@ public class NodeUI extends javax.swing.JFrame {
 
     private void joinBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinBtnActionPerformed
          try {
-            client = new Node(usernameText.getText(),Integer.parseInt(nodeportText.getText()));
+
+            client = new BaseNode(usernameText.getText(),Integer.parseInt(nodeportText.getText()));
             clientServer = new NodeListen(Integer.parseInt(nodeportText.getText()), client);
             new Thread(clientServer,"nodeServer").start();
             bootstrap = new NodeBootstrap(client, InetAddress.getByName(boostrapIpText.getText()),Integer.parseInt(boostrapPortText.getText()));
@@ -261,7 +263,7 @@ public class NodeUI extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        Node client ;
+        BaseNode client ;
         NodeListen clientServer;
         NodeBootstrap bootstrap;  
         NodeDiscovery discovery;

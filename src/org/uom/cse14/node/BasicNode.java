@@ -12,12 +12,12 @@ import java.util.List;
  *
  * @author thulana
  */
-public class BasicNode {
+public abstract class BasicNode {
 
     protected InetAddress address;
     protected String userName;
     protected int port;
-    private int retryCount;
+
 
     public BasicNode() {
     }
@@ -26,17 +26,15 @@ public class BasicNode {
         this.address = address;
         this.userName = userName;
         this.port = port;
-        this.retryCount = 0;
+
     }
 
     public BasicNode(InetAddress address, int port) {
         this.address = address;
         this.port = port;
-        this.retryCount = 0;
+
     }
 
-    public  void setRetryCount (int retryCount){this.retryCount = retryCount; }
-    public  int getRetryCount() {return retryCount; }
 
     public InetAddress getAddress() {
         return address;
