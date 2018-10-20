@@ -72,6 +72,8 @@ public class MsgParser {
             case "JOIN":
                 return new Object[] {0, "error", "response" };
 
+            case "SER":
+
 
         }
 
@@ -86,7 +88,8 @@ public class MsgParser {
                 messageText = messageText+discoverNode.getAddress().getHostAddress()+":"+Integer.toString(discoverNode.getPort());
                 break;
 
-            case "SEARCH":
+            case "SER":
+                messageText = messageText + (String)messageData;
                 return messageText;
 
             case "R_DISCOVER":
