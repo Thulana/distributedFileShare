@@ -5,5 +5,6 @@ public class NetworkConstants {
     }
 
     public static final int NETWORK_HOPS = 2;
+    public static final int SEND_PORT_OFFSET = 300;
 
 }
