@@ -68,15 +68,19 @@ public class BaseNode extends BasicNode {
         socket.send(sendPacket);
     }
 
-    public void search(String fileQuery , int hops){
+    public String search(String fileQuery , int hops){
         String fileName;
+        String fileNameList = "";
 
         for (Object obj: fileList) {
             fileName =  (String)obj;
            if (fileName.contains(fileQuery)){
+               fileNameList = fileNameList + fileName + " ";
                System.out.println(fileName);
             }
         }
+
+    //9999 – failure due to node unreachable
 
         clientList.forEach((neighborKey,neighbor)->{
             try {
@@ -88,6 +92,7 @@ public class BaseNode extends BasicNode {
             }
         });
 
+        return fileNameList;
     }
 
     public void close() {
