@@ -6,7 +6,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.uom.cse14.node.BaseNode;
 import org.uom.cse14.node.NeighbourNode;
@@ -46,6 +45,7 @@ public class NodeListen implements Runnable {
                  */
                 String msg = new String(receivedPacket.getData()).trim();
                 String command = msg.split(" ")[1];
+                System.out.println(msg);
                 switch (command) {
                     case "JOIN" :
                         join(msg,receivedPacket.getAddress(),receivedPacket.getPort());
@@ -57,8 +57,13 @@ public class NodeListen implements Runnable {
                         discoverResponse(msg,receivedPacket.getAddress(),receivedPacket.getPort());
                         break;
                     case "SER" :
-                        System.out.println("search");
-                        search(msg,receivedPacket.getAddress(),receivedPacket.getPort());
+                        searchResponse(msg,receivedPacket.getAddress(),receivedPacket.getPort());
+                        break;
+                    case "SEROK":
+                        System.out.println("comes to the query originator");
+                        break;
+                    case "SER_R":
+                        System.out.println("response to search query received");
                         break;
 
                 }
@@ -137,22 +142,40 @@ public class NodeListen implements Runnable {
 
     }
 
-    private void search(String msg , InetAddress address , int port) throws IOException {
+    /**
+     *sends a response to the search originator after receiving search request
+     */
+    private  void searchResponse(String msg , InetAddress address , int port) throws IOException {
+        System.out.println("piyu");
+        String searchReceived = client.getAddress().getHostAddress() + " " + client.getPort();
+        searchReceived = MsgParser.sendMessageParser(searchReceived,"SER_R");
+        System.out.println(searchReceived + " send to " + (port - NetworkConstants.SEND_PORT_OFFSET));
+        client.send(address,port - NetworkConstants.SEND_PORT_OFFSET,searchReceived);//send reply to the search originator
+        search(msg);
+
+    }
+
+/**
+ * propagate the search request to {@link org.uom.cse14.node.NeighbourNode}
+ * send response to query originator
+ * */
+    private void search(String msg) throws IOException {
         String[] searchMessage = msg.split(" ");
         String fileQuery = searchMessage[4];
         int hops = Integer.parseInt(searchMessage[5]) - 1;
-        String queriedList = this.client.search(fileQuery , hops);
-        int  no_files = 0;
+        String queriedList = this.client.search(fileQuery,hops,InetAddress.getByName(searchMessage[2] ), Integer.parseInt(searchMessage[3]));
+        System.out.println("Search end at neighbor node");
+        int no_files = 0;
         int no_hops = NetworkConstants.NETWORK_HOPS - hops;
 
-        if (queriedList.length() != 0){
+        //send a response to the query originator when a file is found
+        if (queriedList.length() != 0) {
             no_files = queriedList.split(" ").length;
-            //client.send(address,port,reply,this.serverSocket);
+            String response = no_files + " " + client.getAddress().getHostAddress() + " " + client.getPort() + " " + no_hops + " " + queriedList;
+            response = MsgParser.sendMessageParser(response, "SEROK");
+            System.out.println("client response  " + response);
+            client.send(InetAddress.getByName(searchMessage[2]), Integer.parseInt(searchMessage[3]),response );
         }
-        String response = no_files + " " + client.getAddress().getHostAddress() + " " + client.getPort() + " "+no_hops +" " + queriedList;
-        response = MsgParser.sendMessageParser(response,"SEROK");
-        client.sendMsg(response,InetAddress.getByName(searchMessage[2]),Integer.parseInt(searchMessage[3]));
     }
-
 
 }
