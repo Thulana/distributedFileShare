@@ -1,5 +1,7 @@
 package org.uom.cse14.node.util;
 
+/**This class is used to store Constants of the Overlay Network
+ * */
 public class NetworkConstants {
     private NetworkConstants() {
     }
