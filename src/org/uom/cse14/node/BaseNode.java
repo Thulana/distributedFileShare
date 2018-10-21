@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import org.uom.cse14.node.util.MsgParser;
+import org.uom.cse14.node.util.NetworkConstants;
 
 /**
  *
@@ -33,11 +34,26 @@ public class BaseNode extends BasicNode {
     private DatagramChannel channel;
 
     public BaseNode(String userName, int port) throws UnknownHostException, SocketException, IOException {
-        socket = new DatagramSocket();
+        socket = new DatagramSocket(NetworkConstants.SEND_PORT_OFFSET + port);
         this.port = port;
         this.address = InetAddress.getByName("localhost");
         clientList = new ConcurrentHashMap<>();
         fileList = new ArrayList<String>();
+        fileList.add("Adventures of Tintin");
+        fileList.add("Jack and Jill Glee");
+        fileList.add("The Vampire Diarie");
+        fileList.add("King Arthur");    //temporary added here
+        fileList.add("Windows XP");
+        fileList.add("Harry Potter");
+        fileList.add("Kung Fu Panda");
+        fileList.add("Lady Gaga");
+        fileList.add("Twilight");
+        fileList.add("Windows 8");
+        fileList.add("Mission Impossible");
+        fileList.add("Turn Up The Music");
+        fileList.add("Super Mario");
+        fileList.add("American Pickers");
+        fileList.add("Lord of the rings");
         this.userName = userName;
 
     }
@@ -47,7 +63,9 @@ public class BaseNode extends BasicNode {
         this.port = port;
     }
     
-
+/**
+ *Used to communicate with {@link org.uom.cse14.server.BootstrapServer}
+ * */
     public String sendMsg(String msg, InetAddress ip, int port) throws IOException {
         DatagramSocket clientSocket = socket;
         byte[] sendData = new byte[1024];
@@ -68,10 +86,12 @@ public class BaseNode extends BasicNode {
         socket.send(sendPacket);
     }
 
-    public String search(String fileQuery , int hops){
+    public String search(String fileQuery,int hops,InetAddress originatorIp , int originatorPort){
         String fileName;
         String fileNameList = "";
+        String originatorHashKey = originatorIp.getHostAddress()+port;
 
+        System.out.println("Searching file......");
         for (Object obj: fileList) {
             fileName =  (String)obj;
            if (fileName.contains(fileQuery)){
@@ -80,18 +100,27 @@ public class BaseNode extends BasicNode {
             }
         }
 
+        System.out.println("Forward Search to Neighbors");
+        if (hops == NetworkConstants.NETWORK_HOPS){
+            //forward msg to all the neighbors
+            clientList.forEach((neighborKey,neighbor)->{
+                try {
+                    if (!neighborKey.equals(originatorHashKey)){
+                        String msg = originatorIp.getHostAddress() + " " + originatorPort + " " + fileQuery + " " + hops ;
+                        msg = MsgParser.sendMessageParser(msg, "SER");
+                        System.out.println("send msg " + msg);
+                        send(neighbor.getAddress(), neighbor.getPort(),msg);
+                    }
+                } catch (IOException e) {
+                    System.out.println("Error search forward"+ e);
+                }
+            });
+        }else if (hops > 0){
+            //forward msg to randomly selected two neighbor nodes
+            //chance of bouncing back the search query
+        }
     //9999 – failure due to node unreachable
-
-        clientList.forEach((neighborKey,neighbor)->{
-            try {
-                String msg = address.getHostAddress() + " " + port + " " + fileQuery + " " + hops ;
-                msg = MsgParser.sendMessageParser(msg, "SER");
-                sendMsg(msg, neighbor.getAddress(), neighbor.getPort());
-            } catch (IOException e) {
-                System.out.println("Error search forward"+ e);
-            }
-        });
-
+        System.out.println("searching at node " + address.getHostAddress() + " "+ port );
         return fileNameList;
     }
 
