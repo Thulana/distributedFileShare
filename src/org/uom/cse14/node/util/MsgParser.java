@@ -90,7 +90,7 @@ public class MsgParser {
 
             case "SER":
                 messageText = messageText + (String)messageData;
-                return messageText;
+                break;
 
             case "R_DISCOVER":
                 BaseNode client = (BaseNode)messageData;
@@ -105,6 +105,14 @@ public class MsgParser {
             case "LEAVE":
                 BasicNode leaveNode = (BasicNode)messageData;
                 messageText = messageText + leaveNode.getAddress().getHostAddress()+":"+Integer.toString(leaveNode.getPort());
+                break;
+
+            case "SER_R":
+                messageText = messageText + (String)messageData;
+                break;
+
+            case "SEROK":
+                messageText = messageText + (String)messageData;
                 break;
         }
 
