@@ -232,12 +232,10 @@ public class NodeUI extends javax.swing.JFrame {
     }//GEN-LAST:event_joinBtnActionPerformed
 
     private void searchBtnActionPerformed(java.awt.event.ActionEvent evt){
-
+        System.out.println("Search Initiated at BaseNode");
         String fileQuery = query.getText();
-        client.search(fileQuery , NetworkConstants.NETWORK_HOPS);
-
-
-
+        String returned  = client.search(fileQuery , NetworkConstants.NETWORK_HOPS,client.getAddress(),client.getPort());
+        System.out.println(returned);
     }
 
     private void usernameTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameTextActionPerformed
