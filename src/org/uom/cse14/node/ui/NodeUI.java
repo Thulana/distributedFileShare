@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import org.uom.cse14.node.BaseNode;
 import org.uom.cse14.node.NodeController;
 import org.uom.cse14.node.listen.NodeListen;
+import org.uom.cse14.node.util.NetworkConstants;
 import org.uom.cse14.node.util.NodeBootstrap;
 import org.uom.cse14.node.discover.NodeDiscovery;
 
@@ -233,7 +234,7 @@ public class NodeUI extends javax.swing.JFrame {
     private void searchBtnActionPerformed(java.awt.event.ActionEvent evt){
 
         String fileQuery = query.getText();
-        client.search(fileQuery , 1);
+        client.search(fileQuery , NetworkConstants.NETWORK_HOPS);
 
 
 
