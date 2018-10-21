@@ -6,10 +6,12 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.uom.cse14.node.BaseNode;
 import org.uom.cse14.node.NeighbourNode;
 import org.uom.cse14.node.util.MsgParser;
+import org.uom.cse14.node.util.NetworkConstants;
 
 
 public class NodeListen implements Runnable {
@@ -136,12 +138,20 @@ public class NodeListen implements Runnable {
     }
 
     private void search(String msg , InetAddress address , int port) throws IOException {
-        String fileQuery = msg.split(" ")[4];
-        int hops = Integer.parseInt(msg.split(" ")[5]) - 1;
-        this.client.search(fileQuery , hops);
-        String reply = "SEROK 0"; //added temporary
-        reply = reply.length() + reply;
-        //client.send(address,port,reply,this.serverSocket);
+        String[] searchMessage = msg.split(" ");
+        String fileQuery = searchMessage[4];
+        int hops = Integer.parseInt(searchMessage[5]) - 1;
+        String queriedList = this.client.search(fileQuery , hops);
+        int  no_files = 0;
+        int no_hops = NetworkConstants.NETWORK_HOPS - hops;
+
+        if (queriedList.length() != 0){
+            no_files = queriedList.split(" ").length;
+            //client.send(address,port,reply,this.serverSocket);
+        }
+        String response = no_files + " " + client.getAddress().getHostAddress() + " " + client.getPort() + " "+no_hops +" " + queriedList;
+        response = MsgParser.sendMessageParser(response,"SEROK");
+        client.sendMsg(response,InetAddress.getByName(searchMessage[2]),Integer.parseInt(searchMessage[3]));
     }
 
 
