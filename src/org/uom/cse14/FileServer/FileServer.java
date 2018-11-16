@@ -1,33 +1,23 @@
 package org.uom.cse14.FileServer;
 
+import javax.swing.*;
 import java.io.*;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 
-public class FileServer implements FileInterface {
-    public static void main(String argv[]) {
+public class FileServer  extends JPanel implements  FileInterface {
 
-    try{
-        System.setProperty("java.rmi.server.hostname","192.168.8.102");
-        FileServer obj = new FileServer();
-        FileInterface stub = (FileInterface)UnicastRemoteObject.exportObject(obj, 0);
-        Registry registry = LocateRegistry.createRegistry(3045);
-        registry.bind("Hello", stub);
-
-    } catch (Exception e) {
-        System.err.println("Server exception: " + e.toString());
-        e.printStackTrace();
+ 
+    String uploadFilePath;
+    public FileServer(String uFilePath) {
+       uploadFilePath = uFilePath;
     }
-
-    }
-
+        
+    @Override
     public byte[] downloadFile(String fileName){
         try {
-            File file = new File(FileServer.class.getProtectionDomain().getCodeSource().getLocation().getPath()+"/org/uom/cse14/FileServer/"+fileName);
+            File file = new File(uploadFilePath+"/"+fileName);
             byte buffer[] = new byte[(int)file.length()];
             BufferedInputStream input = new
-                    BufferedInputStream(new FileInputStream(FileServer.class.getProtectionDomain().getCodeSource().getLocation().getPath()+"/org/uom/cse14/FileServer/"+fileName));
+                    BufferedInputStream(new FileInputStream(uploadFilePath+"/"+fileName));
             input.read(buffer,0,buffer.length);
             input.close();
             System.out.printf(Integer.toString(buffer.length));

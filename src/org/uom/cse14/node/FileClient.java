@@ -3,29 +3,39 @@ package org.uom.cse14.node;
 import org.uom.cse14.FileServer.FileInterface;
 
 import java.io.*;
+import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class FileClient{
-    public static void main(String argv[]) {
 
-        System.setProperty("java.rmi.server.hostname","192.168.8.102");
+
+public class FileClient{
+    
+    String downlFilePath;
+    String serverIp = "192.168.8.104";
+    int serverPort = 3045;
+    public FileClient(String dFilePath) {
+       downlFilePath = dFilePath;
+    }
+    public  void downloadFile(String fileName) {
+
+        
         try {
-            Registry registry = LocateRegistry.getRegistry("192.168.8.102",3045);
+            Registry registry = LocateRegistry.getRegistry(serverIp,serverPort);
             FileInterface stub = (FileInterface) registry.lookup("Hello");
-            byte[] fileData = stub.downloadFile("TestFile.txt");
+            //byte[] fileData = stub.downloadFile("TestFile.txt");
+            byte[] fileData = stub.downloadFile(fileName);
             System.out.printf(Integer.toString(fileData.length));
-            File file = new File("TestFile.txt");
-            BufferedOutputStream output = new
-                    BufferedOutputStream(new FileOutputStream(FileClient.class.getProtectionDomain().getCodeSource().getLocation().getPath()+"/org/uom/cse14/FileServer/"+file.getName()));
-            output.write(fileData,0,fileData.length);
-            output.flush();
-            output.close();
+            File file = new File(fileName);
+            try (BufferedOutputStream output = new
+                            BufferedOutputStream(new FileOutputStream(downlFilePath+"/"+file.getName()))) {
+                output.write(fileData,0,fileData.length);
+                output.flush();
+            }
             String response = Integer.toString(stub.addTwo(5,10));
             System.out.println("response: " + response);
-        } catch(Exception e) {
+        } catch(IOException | NotBoundException e) {
             System.err.println("FileServer exception: "+ e.getMessage());
-            e.printStackTrace();
         }
     }
 }
