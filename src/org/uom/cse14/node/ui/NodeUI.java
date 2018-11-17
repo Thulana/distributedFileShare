@@ -6,9 +6,13 @@
 package org.uom.cse14.node.ui;
 
 import java.io.IOException;
+import static java.lang.System.out;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -26,6 +30,7 @@ import org.uom.cse14.node.discover.NodeDiscovery;
  * @author thulana
  */
 public class NodeUI extends javax.swing.JFrame {
+
     BaseNode client;
     NodeListen clientServer;
     NodeBootstrap bootstrap;
@@ -35,7 +40,6 @@ public class NodeUI extends javax.swing.JFrame {
     String choosertitle;
     String downFilePath;
     String upFilePath;
-
 
     /**
      * Creates new form ClientUI
@@ -72,8 +76,8 @@ public class NodeUI extends javax.swing.JFrame {
         consoleTextPane = new javax.swing.JTextArea();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
+        dpathText = new javax.swing.JLabel();
+        upathText = new javax.swing.JLabel();
         dfPathBtn = new javax.swing.JButton();
         ufPathBtn = new javax.swing.JButton();
 
@@ -142,9 +146,10 @@ public class NodeUI extends javax.swing.JFrame {
 
         jLabel8.setText("Upload Path :");
 
-        jLabel9.setText("Undefined");
+        dpathText.setText("Undefined");
+        dpathText.setName(""); // NOI18N
 
-        jLabel10.setText("Undefined");
+        upathText.setText("Undefined");
 
         dfPathBtn.setText("File Path");
         dfPathBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -174,7 +179,7 @@ public class NodeUI extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jButton2)
-                                .addGap(0, 317, Short.MAX_VALUE))
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addComponent(query)))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -205,8 +210,8 @@ public class NodeUI extends javax.swing.JFrame {
                                     .addComponent(jLabel8))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
-                                    .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                    .addComponent(dpathText, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(upathText, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(dfPathBtn)
@@ -238,14 +243,14 @@ public class NodeUI extends javax.swing.JFrame {
                     .addComponent(jLabel6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
+                    .addComponent(dpathText)
                     .addComponent(dfPathBtn)
                     .addComponent(jLabel7))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel8)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel10)
+                        .addComponent(upathText)
                         .addComponent(ufPathBtn)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -270,34 +275,45 @@ public class NodeUI extends javax.swing.JFrame {
     }//GEN-LAST:event_nodeportTextActionPerformed
 
     private void joinBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinBtnActionPerformed
-         try {
-              fClient = new FileClient(downFilePath);
-              //fClient.downloadFile("TestFile.txt");
-            fileController = new ServerController(); 
+        try {
+
+            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+            for (NetworkInterface netint : Collections.list(nets)) {
+                out.printf("Display name: %s\n", netint.getDisplayName());
+                out.printf("Name: %s\n", netint.getName());
+                Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+                for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+                    out.printf("InetAddress: %s\n", inetAddress);
+                }
+                out.printf("\n");
+            }
+            fClient = new FileClient(downFilePath);
+            //fClient.downloadFile("TestFile.txt");
+            fileController = new ServerController();
             fileController.createServer(upFilePath);
-            client = new BaseNode(usernameText.getText(),Integer.parseInt(nodeportText.getText()));
+            client = new BaseNode(usernameText.getText(), Integer.parseInt(nodeportText.getText()));
             clientServer = new NodeListen(Integer.parseInt(nodeportText.getText()), client);
-            new Thread(clientServer,"nodeServer").start();
-            bootstrap = new NodeBootstrap(client, InetAddress.getByName(boostrapIpText.getText()),Integer.parseInt(boostrapPortText.getText()));
+            new Thread(clientServer, "nodeServer").start();
+            bootstrap = new NodeBootstrap(client, InetAddress.getByName(boostrapIpText.getText()), Integer.parseInt(boostrapPortText.getText()));
             String response = bootstrap.registerClient(bootstrap.getBootstrapAddr().getHostAddress(), Integer.parseInt(nodeportText.getText()));
             NodeDiscovery discovery = new NodeDiscovery(client);
-            new Thread(discovery,"nodeDiscovery").start();
-            consoleTextPane.append(response+"\n");
-            System.out.println("response : "+response);
-            
+            new Thread(discovery, "nodeDiscovery").start();
+            consoleTextPane.append(response + "\n");
+            System.out.println("response : " + response);
+
         } catch (UnknownHostException ex) {
             Logger.getLogger(NodeController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SocketException ex) {
             Logger.getLogger(NodeController.class.getName()).log(Level.SEVERE, null, ex);
-       } catch (IOException | NumberFormatException ex) {
+        } catch (IOException | NumberFormatException ex) {
             Logger.getLogger(NodeController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_joinBtnActionPerformed
 
-    private void searchBtnActionPerformed(java.awt.event.ActionEvent evt){
+    private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) {
         System.out.println("Search Initiated at BaseNode");
         String fileQuery = query.getText();
-        String returned  = client.search(fileQuery , NetworkConstants.NETWORK_HOPS,client.getAddress(),client.getPort());
+        String returned = client.search(fileQuery, NetworkConstants.NETWORK_HOPS, client.getAddress(), client.getPort());
         System.out.println(returned);
     }
 
@@ -313,7 +329,7 @@ public class NodeUI extends javax.swing.JFrame {
         try {
             InetAddress inet = InetAddress.getLocalHost();
             String response = bootstrap.leaveClient(inet.getHostAddress(), Integer.parseInt(nodeportText.getText()));
-            consoleTextPane.append(response+"\n");
+            consoleTextPane.append(response + "\n");
         } catch (UnknownHostException ex) {
             Logger.getLogger(NodeUI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -323,7 +339,7 @@ public class NodeUI extends javax.swing.JFrame {
 
     private void dfPathBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dfPathBtnActionPerformed
         // TODO add your handling code here:
-          
+
         chooser = new JFileChooser();
         chooser.setCurrentDirectory(new java.io.File("."));
         chooser.setDialogTitle(choosertitle);
@@ -335,12 +351,12 @@ public class NodeUI extends javax.swing.JFrame {
         //
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             System.out.println("getCurrentDirectory(): "
-                    +  chooser.getCurrentDirectory());
+                    + chooser.getCurrentDirectory());
             System.out.println("getSelectedFile() : "
-                    +  chooser.getSelectedFile());
+                    + chooser.getSelectedFile());
             downFilePath = chooser.getSelectedFile().toString();
-        }
-        else {
+            dpathText.setText(downFilePath);
+        } else {
             System.out.println("No Selection ");
         }
     }//GEN-LAST:event_dfPathBtnActionPerformed
@@ -358,12 +374,12 @@ public class NodeUI extends javax.swing.JFrame {
         //
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             System.out.println("getCurrentDirectory(): "
-                    +  chooser.getCurrentDirectory());
+                    + chooser.getCurrentDirectory());
             System.out.println("getSelectedFile() : "
-                    +  chooser.getSelectedFile());
+                    + chooser.getSelectedFile());
             upFilePath = chooser.getSelectedFile().toString();
-        }
-        else {
+            upathText.setText(upFilePath);
+        } else {
             System.out.println("No Selection ");
         }
     }//GEN-LAST:event_ufPathBtnActionPerformed
@@ -372,11 +388,11 @@ public class NodeUI extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        BaseNode client ;
+        BaseNode client;
         NodeListen clientServer;
-        NodeBootstrap bootstrap;  
+        NodeBootstrap bootstrap;
         NodeDiscovery discovery;
-        
+
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -414,9 +430,9 @@ public class NodeUI extends javax.swing.JFrame {
     private javax.swing.JTextField boostrapPortText;
     private javax.swing.JTextArea consoleTextPane;
     private javax.swing.JButton dfPathBtn;
+    private javax.swing.JLabel dpathText;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -424,13 +440,13 @@ public class NodeUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton joinBtn;
     private javax.swing.JButton leaveBtn;
     private javax.swing.JTextField nodeportText;
     private javax.swing.JTextField query;
     private javax.swing.JButton ufPathBtn;
+    private javax.swing.JLabel upathText;
     private javax.swing.JTextField usernameText;
     // End of variables declaration//GEN-END:variables
 }
