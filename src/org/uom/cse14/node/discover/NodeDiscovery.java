@@ -6,16 +6,16 @@
 package org.uom.cse14.node.discover;
 
 import java.io.IOException;
-import java.net.DatagramSocket;
+
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.uom.cse14.node.BasicNode;
-import org.uom.cse14.node.Node;
+import org.uom.cse14.node.BaseNode;
+import org.uom.cse14.node.NeighbourNode;
 import org.uom.cse14.node.util.MsgParser;
 
 /**
@@ -23,36 +23,57 @@ import org.uom.cse14.node.util.MsgParser;
  * @author thulana
  */
 public class NodeDiscovery implements Runnable {
-    private Node node;
+    private BaseNode client;
     private byte[] in;
     private byte[] out;
 
     public NodeDiscovery() {
     }
 
-    public NodeDiscovery(Node node) throws SocketException {
-        this.node = node;
+    public NodeDiscovery(BaseNode client) {
+        this.client = client;
     }
     
     @Override
     public void run() {
         while (true) {            
-            System.out.println("discovering");
+            System.out.println(Integer.toString(client.getPort())+" discovering");
+            System.out.println(client.getClientList().keySet());
+            System.out.println(Integer.toString(client.getPort())+" discovering");
+
             try {
                 Thread.sleep(10000);
 
-                for(Object neighbour :node.getClientList() ){
-                    BasicNode neighbourNode = (BasicNode)neighbour;
-                    if(neighbourNode.getRetryCount() >= 3){
-                        node.removeNeighbour(neighbourNode);
+                List<String> removeList = new ArrayList<>();
+                List<String> possibleList = new ArrayList<>();
+                client.getClientList().forEach((neighborKey,neighbor)->{
+                    if(neighbor.getRetryCount() >= 3){
+                        removeList.add(neighborKey);
                     }
+                    else {
+                        possibleList.add(neighborKey);
+                    }
+                });
+
+                client.getClientList().keySet().removeAll(removeList);
+
+
+                if ((possibleList.size() <6) && (possibleList.size() >1)){
+                    Random r = new Random();
+                    int randNum = r.nextInt(possibleList.size());
+                    NeighbourNode selectedNeighbour = client.getClientList().get( possibleList.get(randNum));
+                    this.discover(selectedNeighbour.getAddress(),selectedNeighbour.getPort());
+
+                    int secondRandomNum = r.nextInt(possibleList.size());
+                    while(randNum == secondRandomNum){
+                        secondRandomNum = r.nextInt(possibleList.size());
+                    }
+                    selectedNeighbour = client.getClientList().get(possibleList.get(randNum));
+                    this.discover(selectedNeighbour.getAddress(),selectedNeighbour.getPort());
                 }
+                else if  (possibleList.size() == 1){
 
-                List neighbourList = node.getClientList();
-
-                if ((neighbourList.size() <6) && (neighbourList.size() >1)){
-                    int randNum = (int) (Math.random() * (neighbourList.size()- 1)) + 1;
-                    BasicNode selectedNeighbour = (BasicNode)neighbourList.get(randNum);
+                    NeighbourNode selectedNeighbour = client.getClientList().get( possibleList.get(0));
                     this.discover(selectedNeighbour.getAddress(),selectedNeighbour.getPort());
                 }
 
@@ -66,8 +87,8 @@ public class NodeDiscovery implements Runnable {
     }
 
     private void discover(InetAddress ipAddress, int port) throws IOException {
-        String discoverMessage = MsgParser.sendMessageParser(node,"DISCOVER");
-        node.send(ipAddress,port,discoverMessage);
+        String discoverMessage = MsgParser.sendMessageParser(client,"DISCOVER");
+        client.send(ipAddress,port,discoverMessage);
     }
     // thread for node discovery ( target - keep active node count > 3 )
     
