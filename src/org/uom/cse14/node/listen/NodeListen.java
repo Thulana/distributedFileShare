@@ -95,10 +95,12 @@ public class NodeListen implements Runnable {
     }
     
     private void getSearchResults(String msg){
+        System.out.println("+++++++++++++++++++ file found +++++++++++++++++++++");
         String[] msg_list = msg.trim().split(" ");
         String[] files = Arrays.copyOfRange(msg_list, 6, msg_list.length);
         String ip = msg.split(" ")[3];
         for (String file : files) {
+            System.out.println("file : "+file);
             System.out.println(file);
             searchResults.put(file, ip);
         }

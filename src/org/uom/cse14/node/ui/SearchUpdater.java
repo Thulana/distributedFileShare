@@ -28,13 +28,15 @@ public class SearchUpdater extends SwingWorker<Integer, String> {
 
     @Override
     protected Integer doInBackground() throws Exception {
+        System.out.println("updater initiated");
         Thread.currentThread().sleep(waitTime);
+        System.out.println("waiting time completed");
         return 1;
     }
 
     @Override
     protected void done() {
-        super.done(); //To change body of generated methods, choose Tools | Templates.
+//        super.done(); //To change body of generated methods, choose Tools | Templates.
         if (searchResult.size() > 0) {
             for (String key : searchResult.keySet()) {
                 resultBox.addItem(key+" "+searchResult.get(key));
