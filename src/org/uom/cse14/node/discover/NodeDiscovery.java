@@ -8,7 +8,6 @@ package org.uom.cse14.node.discover;
 import java.io.IOException;
 
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -81,7 +80,6 @@ public class NodeDiscovery implements Runnable {
             } catch (InterruptedException ex) {
                 Logger.getLogger(NodeDiscovery.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }

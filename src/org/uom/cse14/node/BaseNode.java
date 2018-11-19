@@ -5,6 +5,7 @@
  */
 package org.uom.cse14.node;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -12,8 +13,6 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.channels.DatagramChannel;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import org.uom.cse14.node.util.MsgParser;
 import org.uom.cse14.node.util.NetworkConstants;
@@ -26,36 +25,21 @@ public class BaseNode extends BasicNode {
 
     private DatagramSocket socket;
 
-    private List fileList;
+    private String upFilePath;
 
     private ConcurrentHashMap<String,NeighbourNode> clientList;
 
     private byte[] buf;
     private DatagramChannel channel;
 
-    public BaseNode(String userName, int port) throws UnknownHostException, SocketException, IOException {
+    public BaseNode(String userName, int port,String upFilePath) throws UnknownHostException, SocketException, IOException {
         socket = new DatagramSocket(NetworkConstants.SEND_PORT_OFFSET + port);
         this.port = port;
         this.address = InetAddress.getByName("localhost");
-        clientList = new ConcurrentHashMap<>();
-        fileList = new ArrayList<String>();
-        fileList.add("Adventures of Tintin");
-        fileList.add("Jack and Jill Glee");
-        fileList.add("The Vampire Diarie");
-        fileList.add("King Arthur");    //temporary added here
-        fileList.add("Windows XP");
-        fileList.add("Harry Potter");
-        fileList.add("Kung Fu Panda");
-        fileList.add("Lady Gaga");
-        fileList.add("Twilight");
-        fileList.add("Windows 8");
-        fileList.add("Mission Impossible");
-        fileList.add("Turn Up The Music");
-        fileList.add("Super Mario");
-        fileList.add("American Pickers");
-        fileList.add("Lord of the rings");
+        this.upFilePath = upFilePath;
         this.userName = userName;
-
+        clientList = new ConcurrentHashMap();
+    
     }
 
     public BaseNode(InetAddress address, int port) {
@@ -92,6 +76,11 @@ public class BaseNode extends BasicNode {
         String originatorHashKey = originatorIp.getHostAddress()+port;
 
         System.out.println("Searching file......");
+        File file = new File(this.upFilePath);
+        String[] fileList = file.list();
+        for(String name:fileList){
+            System.out.println(name);
+        }
         for (Object obj: fileList) {
             fileName =  (String)obj;
            if (fileName.contains(fileQuery)){

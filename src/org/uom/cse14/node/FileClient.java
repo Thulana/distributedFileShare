@@ -12,12 +12,11 @@ import java.rmi.registry.Registry;
 public class FileClient{
     
     String downlFilePath;
-    String serverIp = "192.168.8.104";
-    int serverPort = 3045;
+    
     public FileClient(String dFilePath) {
        downlFilePath = dFilePath;
     }
-    public  void downloadFile(String fileName) {
+    public  void downloadFile(String fileName, String serverIp,int serverPort) {
 
         
         try {
