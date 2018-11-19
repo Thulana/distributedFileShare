@@ -28,12 +28,17 @@ public class WorkerRunnable extends NodeListen implements Runnable {
 //        this.serverText   = serverText;
 //        super(0, null);
 //    }
-    public WorkerRunnable(int port, BaseNode client, Socket clientSocket, String msg) throws SocketException {
-        super(port, client);
-        this.clientSocket = clientSocket;
-        this.serverText = msg;
+//    public WorkerRunnable(int port, BaseNode client, Socket clientSocket, String msg) throws SocketException {
+//        super(port, client);
+//        this.clientSocket = clientSocket;
+//        this.serverText = msg;
+//
+//    }
 
+    public WorkerRunnable() throws SocketException {
+        super(1, null, null);
     }
+    
 
     public void run() {
         String command = serverText.split(" ")[1];

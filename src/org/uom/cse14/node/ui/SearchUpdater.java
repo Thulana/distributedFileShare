@@ -15,24 +15,31 @@ import javax.swing.SwingWorker;
  * @author thulana
  */
 public class SearchUpdater extends SwingWorker<Integer, String> {
+
     private JComboBox resultBox;
-    private ConcurrentHashMap<String,String> searchResult;
-    public SearchUpdater(JComboBox resultBox, ConcurrentHashMap<String,String> searchResult) {
-        
+    private ConcurrentHashMap<String, String> searchResult;
+    private int waitTime;
+
+    public SearchUpdater(JComboBox resultBox, ConcurrentHashMap<String, String> searchResult, int waitTime) {
+        this.resultBox = resultBox;
+        this.searchResult = searchResult;
+        this.waitTime = waitTime;
     }
 
-    
     @Override
     protected Integer doInBackground() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Thread.currentThread().sleep(waitTime);
+        return 1;
     }
-
 
     @Override
     protected void done() {
         super.done(); //To change body of generated methods, choose Tools | Templates.
+        if (searchResult.size() > 0) {
+            for (String key : searchResult.keySet()) {
+                resultBox.addItem(key+" "+searchResult.get(key));
+            }
+        }
     }
-    
-    
-    
+
 }

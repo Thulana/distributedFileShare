@@ -13,6 +13,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -40,12 +41,14 @@ public class NodeUI extends javax.swing.JFrame {
     String choosertitle;
     String downFilePath;
     String upFilePath;
+    ConcurrentHashMap<String, String> results;
 
     /**
      * Creates new form ClientUI
      */
     public NodeUI() {
         initComponents();
+        results = new ConcurrentHashMap<>();
 
     }
 
@@ -80,7 +83,7 @@ public class NodeUI extends javax.swing.JFrame {
         upathText = new javax.swing.JLabel();
         dfPathBtn = new javax.swing.JButton();
         ufPathBtn = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        resultBox = new javax.swing.JComboBox<>();
         jLabel9 = new javax.swing.JLabel();
         downloadBtn = new javax.swing.JButton();
 
@@ -173,9 +176,9 @@ public class NodeUI extends javax.swing.JFrame {
             }
         });
 
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        resultBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                resultBoxActionPerformed(evt);
             }
         });
 
@@ -239,7 +242,7 @@ public class NodeUI extends javax.swing.JFrame {
                                 .addComponent(srchBtn)
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(resultBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(downloadBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
@@ -290,7 +293,7 @@ public class NodeUI extends javax.swing.JFrame {
                 .addComponent(srchBtn)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(resultBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9)
                     .addComponent(downloadBtn))
                 .addContainerGap(34, Short.MAX_VALUE))
@@ -321,7 +324,7 @@ public class NodeUI extends javax.swing.JFrame {
             fileController = new ServerController();
             fileController.createServer(upFilePath);
             client = new BaseNode(usernameText.getText(), Integer.parseInt(nodeportText.getText()));
-            clientServer = new NodeListen(Integer.parseInt(nodeportText.getText()), client);
+            clientServer = new NodeListen(Integer.parseInt(nodeportText.getText()), client,results);
             new Thread(clientServer, "nodeServer").start();
             bootstrap = new NodeBootstrap(client, InetAddress.getByName(boostrapIpText.getText()), Integer.parseInt(boostrapPortText.getText()));
             String response = bootstrap.registerClient(bootstrap.getBootstrapAddr().getHostAddress(), Integer.parseInt(nodeportText.getText()));
@@ -418,11 +421,12 @@ public class NodeUI extends javax.swing.JFrame {
         String fileQuery = query.getText();
         String returned = client.search(fileQuery, NetworkConstants.NETWORK_HOPS, client.getAddress(), client.getPort());
         System.out.println(returned);
+        new SearchUpdater(resultBox, results, 3000).execute();
     }//GEN-LAST:event_srchBtnActionPerformed
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void resultBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resultBoxActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    }//GEN-LAST:event_resultBoxActionPerformed
             
     /**
      * @param args the command line arguments
@@ -472,7 +476,6 @@ public class NodeUI extends javax.swing.JFrame {
     private javax.swing.JButton dfPathBtn;
     private javax.swing.JButton downloadBtn;
     private javax.swing.JLabel dpathText;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -487,6 +490,7 @@ public class NodeUI extends javax.swing.JFrame {
     private javax.swing.JButton leaveBtn;
     private javax.swing.JTextField nodeportText;
     private javax.swing.JTextField query;
+    private javax.swing.JComboBox<String> resultBox;
     private javax.swing.JButton srchBtn;
     private javax.swing.JButton ufPathBtn;
     private javax.swing.JLabel upathText;
