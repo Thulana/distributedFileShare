@@ -10,6 +10,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import static org.uom.cse14.node.util.NetworkConstants.TCP_PORT_OFFSET;
 
 /**
  *
@@ -18,12 +19,12 @@ import java.rmi.server.UnicastRemoteObject;
 public class ServerController {
     FileServer fs;
         
-    public void createServer(String upPath){
+    public void createServer(String upPath,int portNum){
         try{
         fs = new FileServer(upPath);
         System.setProperty("java.rmi.server.hostname","192.168.8.100");
         FileInterface stub = (FileInterface)UnicastRemoteObject.exportObject(fs, 0);
-        Registry registry = LocateRegistry.createRegistry(3045);
+        Registry registry = LocateRegistry.createRegistry(portNum+TCP_PORT_OFFSET);
         registry.bind("Hello", stub);
 
 

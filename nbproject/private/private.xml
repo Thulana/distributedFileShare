@@ -3,7 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/media/pasindu/newvolume/distributedFileShare/src/org/uom/cse14/FileServer/ServerController.java</file>
             <file>file:/media/pasindu/newvolume/distributedFileShare/src/org/uom/cse14/node/ui/NodeUI.java</file>
+            <file>file:/media/pasindu/newvolume/distributedFileShare/src/org/uom/cse14/node/FileClient.java</file>
+            <file>file:/media/pasindu/newvolume/distributedFileShare/src/org/uom/cse14/FileServer/FileInterface.java</file>
+            <file>file:/media/pasindu/newvolume/distributedFileShare/src/org/uom/cse14/FileServer/FileServer.java</file>
         </group>
     </open-files>
 </project-private>

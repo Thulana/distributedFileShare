@@ -61,9 +61,11 @@ public class NodeListen implements Runnable {
                         break;
                     case "SEROK":
                         System.out.println("comes to the query originator");
+                        //lets begin the download
                         break;
                     case "SER_R":
                         System.out.println("response to search query received");
+                        //Retry count down or add new request
                         break;
 
                 }
