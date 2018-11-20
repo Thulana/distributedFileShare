@@ -79,6 +79,7 @@ public class NodeListen implements Runnable {
                         break;
                     case "SER_R":
                         System.out.println("response to search query received");
+                        searchResponseHandle(msg,receivedPacket.getAddress(),receivedPacket.getPort());
                         //Retry count down or add new request
                         break;
 
@@ -172,12 +173,20 @@ public class NodeListen implements Runnable {
      */
     private  void searchResponse(String msg , InetAddress address , int port) throws IOException {
         System.out.println("piyu");
-        String searchReceived = client.getAddress().getHostAddress() + " " + client.getPort();
+        String[] searchMessage = msg.split(" ");
+        String searchReceived = client.getAddress().getHostAddress() + " " + client.getPort()+" "+searchMessage[4];
         searchReceived = MsgParser.sendMessageParser(searchReceived,"SER_R");
         System.out.println(searchReceived + " send to " + (port - NetworkConstants.SEND_PORT_OFFSET));
         client.send(address,port - NetworkConstants.SEND_PORT_OFFSET,searchReceived);//send reply to the search originator
-        String[] searchMessage = msg.split(" ");
         this.client.search(searchMessage[4],Integer.parseInt(searchMessage[5]),InetAddress.getByName(searchMessage[2] ),Integer.parseInt(searchMessage[3]),address,port - NetworkConstants.SEND_PORT_OFFSET);
+    }
+
+    private void searchResponseHandle(String msg, InetAddress address, int port) {
+        String[] searchRMessage = msg.split(" ");
+        String portS = Integer.toString(port- NetworkConstants.SEND_PORT_OFFSET);
+        String hash = "SR&"+searchRMessage[4]+"&"+address.getHostAddress()+portS;
+        client.updateRetryCount(address.getHostAddress()+portS, "decre");
+        client.removeTask(hash);       
     }
 
 /**

@@ -6,23 +6,18 @@
 package org.uom.cse14.node.ui;
 
 import java.io.IOException;
-import static java.lang.System.out;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import java.util.List;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import org.uom.cse14.FileServer.ServerController;
+import org.uom.cse14.TaskWorker.TaskWorker;
 import org.uom.cse14.node.BaseNode;
 import org.uom.cse14.node.FileClient;
 import org.uom.cse14.node.NodeController;
@@ -46,6 +41,7 @@ public class NodeUI extends javax.swing.JFrame {
     String choosertitle;
     String downFilePath;
     String upFilePath;
+    TaskWorker worker;
     ConcurrentHashMap<String, String> results;
 
     /**
@@ -327,11 +323,13 @@ public class NodeUI extends javax.swing.JFrame {
    
             client = new BaseNode(usernameText.getText(), Integer.parseInt(nodeportText.getText()),upFilePath);
             clientServer = new NodeListen(Integer.parseInt(nodeportText.getText()), client,results);
+            worker= new TaskWorker(client);
             fClient = new FileClient(downFilePath);
             //fClient.downloadFile("TestFile.txt");
             fileController = new ServerController();
             fileController.createServer(upFilePath,Integer.parseInt(nodeportText.getText()));
             new Thread(clientServer, "nodeServer").start();
+            new Thread(worker, "worker").start();
             bootstrap = new NodeBootstrap(client, InetAddress.getByName(boostrapIpText.getText()), Integer.parseInt(boostrapPortText.getText()));
             String response = bootstrap.registerClient(bootstrap.getBootstrapAddr().getHostAddress(), Integer.parseInt(nodeportText.getText()));
             NodeDiscovery discovery = new NodeDiscovery(client);
