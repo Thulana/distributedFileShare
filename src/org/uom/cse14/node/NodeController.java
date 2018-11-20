@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.uom.cse14.node.listen.NodeListen;
@@ -24,8 +25,10 @@ public class NodeController {
     public static int bootstrapPort = 55555;
     public static void main(String[] args) {
         try {
-            BaseNode client = new BaseNode("testClient2",2237,"sdsds");
-            NodeListen clientServer = new NodeListen(2236, client);
+
+            ConcurrentHashMap<String,String> results = new ConcurrentHashMap<>();
+            BaseNode client = new BaseNode("testClient2",2237,"dfdv");
+            NodeListen clientServer = new NodeListen(2236, client,results);
             new Thread(clientServer,"nodeServer").start();
             NodeBootstrap bootstrap = new NodeBootstrap(client, InetAddress.getByName(NodeController.bootstrapIP),NodeController.bootstrapPort );
             String response = bootstrap.registerClient(bootstrapIP, 2236);

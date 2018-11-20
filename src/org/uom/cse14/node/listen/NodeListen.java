@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.uom.cse14.node.BaseNode;
 import org.uom.cse14.node.NeighbourNode;
@@ -18,14 +20,22 @@ public class NodeListen implements Runnable {
 
     private DatagramSocket serverSocket;
     private BaseNode client;
+    private ConcurrentHashMap<String,String> searchResults;
 
     /*
      * Our constructor which instantiates our serverSocket
      */
-    public NodeListen(int port, BaseNode client) throws SocketException {
-        serverSocket = new DatagramSocket(port);
+//    public NodeListen(int port, BaseNode client) throws SocketException {
+//        serverSocket = new DatagramSocket(port);
+//        this.client = client;
+//    }
+//
+    public NodeListen(int port, BaseNode client, ConcurrentHashMap<String, String> searchResults) throws SocketException {
+        this.serverSocket = new DatagramSocket(port);
         this.client = client;
+        this.searchResults = searchResults;
     }
+    
 
     public void run() {
         while (true) {
@@ -61,7 +71,11 @@ public class NodeListen implements Runnable {
                         break;
                     case "SEROK":
                         System.out.println("comes to the query originator");
+
+                        getSearchResults(msg);
+
                         //lets begin the download
+
                         break;
                     case "SER_R":
                         System.out.println("response to search query received");
@@ -79,7 +93,16 @@ public class NodeListen implements Runnable {
 
         }
     }
-
+    
+    private void getSearchResults(String msg){
+        String[] msg_list = msg.trim().split(" ");
+        String[] files = Arrays.copyOfRange(msg_list, 6, msg_list.length);
+        String ip = msg.split(" ")[3];
+        for (String file : files) {
+            System.out.println(file);
+            searchResults.put(file, ip);
+        }
+    }
 
 
     private void join(String msg,InetAddress address,int port ) throws IOException {
