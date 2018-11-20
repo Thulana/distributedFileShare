@@ -308,16 +308,16 @@ public class NodeUI extends javax.swing.JFrame {
     private void joinBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinBtnActionPerformed
         try {
 
-            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-            for (NetworkInterface netint : Collections.list(nets)) {
-                out.printf("Display name: %s\n", netint.getDisplayName());
-                out.printf("Name: %s\n", netint.getName());
-                Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
-                Collections.list(inetAddresses).forEach((inetAddress) -> {
-                    out.printf("InetAddress: %s\n", inetAddress);
-                });
-                out.printf("\n");
-            }
+//            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+//            for (NetworkInterface netint : Collections.list(nets)) {
+//                out.printf("Display name: %s\n", netint.getDisplayName());
+//                out.printf("Name: %s\n", netint.getName());
+//                Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+//                Collections.list(inetAddresses).forEach((inetAddress) -> {
+//                    out.printf("InetAddress: %s\n", inetAddress);
+//                });
+//                out.printf("\n");
+//            }
    
             client = new BaseNode(usernameText.getText(), Integer.parseInt(nodeportText.getText()),upFilePath);
             clientServer = new NodeListen(Integer.parseInt(nodeportText.getText()), client);
@@ -342,11 +342,11 @@ public class NodeUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_joinBtnActionPerformed
 
-    private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) {
+    private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) throws IOException {
         System.out.println("Search Initiated at BaseNode");
         String fileQuery = query.getText();
-        String returned = client.search(fileQuery, NetworkConstants.NETWORK_HOPS, client.getAddress(), client.getPort());
-        System.out.println(returned);
+        client.search(fileQuery, NetworkConstants.NETWORK_HOPS, client.getAddress(), client.getPort(),client.getAddress(), client.getPort());
+        
     }
 
     private void usernameTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameTextActionPerformed
@@ -419,8 +419,12 @@ public class NodeUI extends javax.swing.JFrame {
     private void srchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_srchBtnActionPerformed
         System.out.println("Search Initiated at BaseNode");
         String fileQuery = query.getText();
-        String returned = client.search(fileQuery, NetworkConstants.NETWORK_HOPS, client.getAddress(), client.getPort());
-        System.out.println(returned);
+        try {
+            client.search(fileQuery, NetworkConstants.NETWORK_HOPS, client.getAddress(), client.getPort(),client.getAddress(), client.getPort());
+        } catch (IOException ex) {
+            Logger.getLogger(NodeUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }//GEN-LAST:event_srchBtnActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed

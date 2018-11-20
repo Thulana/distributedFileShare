@@ -70,32 +70,61 @@ public class BaseNode extends BasicNode {
         socket.send(sendPacket);
     }
 
-    public String search(String fileQuery,int hops,InetAddress originatorIp , int originatorPort){
+    public void search(String fileQuery,int hops,InetAddress originatorIp , int originatorPort,InetAddress senderIp , int senderPort) throws IOException{
         String fileName;
         String fileNameList = "";
-        String originatorHashKey = originatorIp.getHostAddress()+port;
+        String originatorHashKey = originatorIp.getHostAddress()+originatorPort;
+        String searchParentHashkey = senderIp.getHostAddress()+senderPort;
 
         System.out.println("Searching file......");
-        File file = new File(this.upFilePath);
-        String[] fileList = file.list();
-        for(String name:fileList){
-            System.out.println(name);
-        }
-        for (Object obj: fileList) {
-            fileName =  (String)obj;
-           if (fileName.contains(fileQuery)){
-               fileNameList = fileNameList + fileName + " ";
-               System.out.println(fileName);
+        boolean isFileThere = false;
+        if (hops < NetworkConstants.NETWORK_HOPS){
+            File file = new File(this.upFilePath);
+            String[] fileList = file.list();
+            System.out.println(fileQuery);
+            String tmpFileQuery = fileQuery.toLowerCase();
+            for (Object obj: fileList) {
+                fileName =  (String)obj;
+                fileName = fileName.toLowerCase();
+                if (fileName.contains(tmpFileQuery)){
+                    fileNameList = fileNameList + fileName + " ";
+                    System.out.println("Found"+fileName);
+                    isFileThere = true;
+                    }
+            }
+            
+            if(!isFileThere & hops > 0 ){
+            int newHops = hops-1;
+            System.out.println("Forward Search to Neighbors");
+                //forward msg to all the neighbors
+
+                clientList.forEach((neighborKey,neighbor)->{
+                    try {
+                        System.out.println(originatorHashKey);
+                        if (!neighborKey.equals(originatorHashKey)){
+                            if (!neighborKey.equals(searchParentHashkey)){
+                                String msg = originatorIp.getHostAddress() + " " + originatorPort + " " + fileQuery + " " + newHops ;
+                                msg = MsgParser.sendMessageParser(msg, "SER");
+                                System.out.println("send msg " + msg);
+                                send(neighbor.getAddress(), neighbor.getPort(),msg);
+                            }
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Error search forward"+ e);
+                    }
+                });
             }
         }
-
+        else if(hops== NetworkConstants.NETWORK_HOPS){
+        int newHops = hops-1;
         System.out.println("Forward Search to Neighbors");
-        if (hops == NetworkConstants.NETWORK_HOPS){
             //forward msg to all the neighbors
+            
             clientList.forEach((neighborKey,neighbor)->{
                 try {
+                    System.out.println(originatorHashKey);
                     if (!neighborKey.equals(originatorHashKey)){
-                        String msg = originatorIp.getHostAddress() + " " + originatorPort + " " + fileQuery + " " + hops ;
+                        String msg = originatorIp.getHostAddress() + " " + originatorPort + " " + fileQuery + " " + newHops ;
                         msg = MsgParser.sendMessageParser(msg, "SER");
                         System.out.println("send msg " + msg);
                         send(neighbor.getAddress(), neighbor.getPort(),msg);
@@ -104,13 +133,16 @@ public class BaseNode extends BasicNode {
                     System.out.println("Error search forward"+ e);
                 }
             });
-        }else if (hops > 0){
-            //forward msg to randomly selected two neighbor nodes
-            //chance of bouncing back the search query
         }
+        if(isFileThere){
+            int no_files = fileNameList.split(" ").length;
+            String response = no_files + " " + this.address + " " + this.port + " " + hops + " " + fileNameList;
+            response = MsgParser.sendMessageParser(response, "SEROK");
+            System.out.println("client response  " + response);
+            this.send(originatorIp, originatorPort,response );
+        }
+      
     //9999 – failure due to node unreachable
-        System.out.println("searching at node " + address.getHostAddress() + " "+ port );
-        return fileNameList;
     }
 
     public void close() {

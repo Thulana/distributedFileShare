@@ -17,7 +17,6 @@ public class FileClient{
        downlFilePath = dFilePath;
     }
     public  void downloadFile(String fileName, String serverIp,int serverPort) {
-
         
         try {
             Registry registry = LocateRegistry.getRegistry(serverIp,serverPort);
