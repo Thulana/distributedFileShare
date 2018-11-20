@@ -425,18 +425,13 @@ public class NodeUI extends javax.swing.JFrame {
     private void srchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_srchBtnActionPerformed
         System.out.println("Search Initiated at BaseNode");
         String fileQuery = query.getText();
-<<<<<<< HEAD
+
         try {
             client.search(fileQuery, NetworkConstants.NETWORK_HOPS, client.getAddress(), client.getPort(),client.getAddress(), client.getPort());
         } catch (IOException ex) {
             Logger.getLogger(NodeUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-=======
-        String returned = client.search(fileQuery, NetworkConstants.NETWORK_HOPS, client.getAddress(), client.getPort());
-        System.out.println(returned);
+        };
         new SearchUpdater(resultBox, results, 3000).execute();
->>>>>>> cf7ebe89d9c0b37b1e7bcd97c2e67d28ba5c8350
     }//GEN-LAST:event_srchBtnActionPerformed
 
     private void resultBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resultBoxActionPerformed
