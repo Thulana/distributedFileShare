@@ -36,9 +36,9 @@ public class NodeDiscovery implements Runnable {
     @Override
     public void run() {
         while (true) {            
-            System.out.println(Integer.toString(client.getPort())+" discovering");
-            System.out.println(client.getClientList().keySet());
-            System.out.println(Integer.toString(client.getPort())+" discovering");
+//            System.out.println(Integer.toString(client.getPort())+" discovering");
+//            System.out.println(client.getClientList().keySet());
+//            System.out.println(Integer.toString(client.getPort())+" discovering");
 
             try {
                 Thread.sleep(10000);

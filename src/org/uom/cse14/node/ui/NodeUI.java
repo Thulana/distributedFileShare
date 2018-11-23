@@ -6,23 +6,18 @@
 package org.uom.cse14.node.ui;
 
 import java.io.IOException;
-import static java.lang.System.out;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import java.util.List;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import org.uom.cse14.FileServer.ServerController;
+import org.uom.cse14.TaskWorker.TaskWorker;
 import org.uom.cse14.node.BaseNode;
 import org.uom.cse14.node.FileClient;
 import org.uom.cse14.node.NodeController;
@@ -46,6 +41,7 @@ public class NodeUI extends javax.swing.JFrame {
     String choosertitle;
     String downFilePath;
     String upFilePath;
+    TaskWorker worker;
     ConcurrentHashMap<String, String> results;
 
     /**
@@ -314,24 +310,26 @@ public class NodeUI extends javax.swing.JFrame {
     private void joinBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinBtnActionPerformed
         try {
 
-            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-            for (NetworkInterface netint : Collections.list(nets)) {
-                out.printf("Display name: %s\n", netint.getDisplayName());
-                out.printf("Name: %s\n", netint.getName());
-                Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
-                Collections.list(inetAddresses).forEach((inetAddress) -> {
-                    out.printf("InetAddress: %s\n", inetAddress);
-                });
-                out.printf("\n");
-            }
+//            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+//            for (NetworkInterface netint : Collections.list(nets)) {
+//                out.printf("Display name: %s\n", netint.getDisplayName());
+//                out.printf("Name: %s\n", netint.getName());
+//                Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
+//                Collections.list(inetAddresses).forEach((inetAddress) -> {
+//                    out.printf("InetAddress: %s\n", inetAddress);
+//                });
+//                out.printf("\n");
+//            }
    
             client = new BaseNode(usernameText.getText(), Integer.parseInt(nodeportText.getText()),upFilePath);
             clientServer = new NodeListen(Integer.parseInt(nodeportText.getText()), client,results);
+            worker= new TaskWorker(client);
             fClient = new FileClient(downFilePath);
             //fClient.downloadFile("TestFile.txt");
             fileController = new ServerController();
             fileController.createServer(upFilePath,Integer.parseInt(nodeportText.getText()));
             new Thread(clientServer, "nodeServer").start();
+            new Thread(worker, "worker").start();
             bootstrap = new NodeBootstrap(client, InetAddress.getByName(boostrapIpText.getText()), Integer.parseInt(boostrapPortText.getText()));
             String response = bootstrap.registerClient(bootstrap.getBootstrapAddr().getHostAddress(), Integer.parseInt(nodeportText.getText()));
             NodeDiscovery discovery = new NodeDiscovery(client);
@@ -348,11 +346,11 @@ public class NodeUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_joinBtnActionPerformed
 
-    private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) {
+    private void searchBtnActionPerformed(java.awt.event.ActionEvent evt) throws IOException {
         System.out.println("Search Initiated at BaseNode");
         String fileQuery = query.getText();
-        String returned = client.search(fileQuery, NetworkConstants.NETWORK_HOPS, client.getAddress(), client.getPort());
-        System.out.println(returned);
+        client.search(fileQuery, NetworkConstants.NETWORK_HOPS, client.getAddress(), client.getPort(),client.getAddress(), client.getPort());
+        
     }
 
     private void usernameTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameTextActionPerformed
@@ -425,8 +423,12 @@ public class NodeUI extends javax.swing.JFrame {
     private void srchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_srchBtnActionPerformed
         System.out.println("Search Initiated at BaseNode");
         String fileQuery = query.getText();
-        String returned = client.search(fileQuery, NetworkConstants.NETWORK_HOPS, client.getAddress(), client.getPort());
-        System.out.println(returned);
+
+        try {
+            client.search(fileQuery, NetworkConstants.NETWORK_HOPS, client.getAddress(), client.getPort(),client.getAddress(), client.getPort());
+        } catch (IOException ex) {
+            Logger.getLogger(NodeUI.class.getName()).log(Level.SEVERE, null, ex);
+        };
         new SearchUpdater(resultBox, results, 3000).execute();
     }//GEN-LAST:event_srchBtnActionPerformed
 

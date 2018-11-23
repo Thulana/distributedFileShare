@@ -55,7 +55,7 @@ public class NodeListen implements Runnable {
                  */
                 String msg = new String(receivedPacket.getData()).trim();
                 String command = msg.split(" ")[1];
-                System.out.println(msg);
+                //System.out.println(msg);
                 switch (command) {
                     case "JOIN" :
                         join(msg,receivedPacket.getAddress(),receivedPacket.getPort());
@@ -79,6 +79,7 @@ public class NodeListen implements Runnable {
                         break;
                     case "SER_R":
                         System.out.println("response to search query received");
+                        searchResponseHandle(msg,receivedPacket.getAddress(),receivedPacket.getPort());
                         //Retry count down or add new request
                         break;
 
@@ -174,35 +175,43 @@ public class NodeListen implements Runnable {
      */
     private  void searchResponse(String msg , InetAddress address , int port) throws IOException {
         System.out.println("piyu");
-        String searchReceived = client.getAddress().getHostAddress() + " " + client.getPort();
+        String[] searchMessage = msg.split(" ");
+        String searchReceived = client.getAddress().getHostAddress() + " " + client.getPort()+" "+searchMessage[4];
         searchReceived = MsgParser.sendMessageParser(searchReceived,"SER_R");
         System.out.println(searchReceived + " send to " + (port - NetworkConstants.SEND_PORT_OFFSET));
         client.send(address,port - NetworkConstants.SEND_PORT_OFFSET,searchReceived);//send reply to the search originator
-        search(msg);
+        this.client.search(searchMessage[4],Integer.parseInt(searchMessage[5]),InetAddress.getByName(searchMessage[2] ),Integer.parseInt(searchMessage[3]),address,port - NetworkConstants.SEND_PORT_OFFSET);
+    }
 
+    private void searchResponseHandle(String msg, InetAddress address, int port) {
+        String[] searchRMessage = msg.split(" ");
+        String portS = Integer.toString(port- NetworkConstants.SEND_PORT_OFFSET);
+        String hash = "SR&"+searchRMessage[4]+"&"+address.getHostAddress()+portS;
+        client.updateRetryCount(address.getHostAddress()+portS, "decre");
+        client.removeTask(hash);       
     }
 
 /**
  * propagate the search request to {@link org.uom.cse14.node.NeighbourNode}
  * send response to query originator
  * */
-    private void search(String msg) throws IOException {
-        String[] searchMessage = msg.split(" ");
-        String fileQuery = searchMessage[4];
-        int hops = Integer.parseInt(searchMessage[5]) - 1;
-        String queriedList = this.client.search(fileQuery,hops,InetAddress.getByName(searchMessage[2] ), Integer.parseInt(searchMessage[3]));
-        System.out.println("Search end at neighbor node");
-        int no_files = 0;
-        int no_hops = NetworkConstants.NETWORK_HOPS - hops;
-
-        //send a response to the query originator when a file is found
-        if (queriedList.length() != 0) {
-            no_files = queriedList.split(" ").length;
-            String response = no_files + " " + client.getAddress().getHostAddress() + " " + client.getPort() + " " + no_hops + " " + queriedList;
-            response = MsgParser.sendMessageParser(response, "SEROK");
-            System.out.println("client response  " + response);
-            client.send(InetAddress.getByName(searchMessage[2]), Integer.parseInt(searchMessage[3]),response );
-        }
-    }
+//    private void search(String msg) throws IOException {
+//        String[] searchMessage = msg.split(" ");
+//        String fileQuery = searchMessage[4];
+//        int hops = Integer.parseInt(searchMessage[5]) - 1;
+//        String queriedList = this.client.search(fileQuery,hops,InetAddress.getByName(searchMessage[2] ), Integer.parseInt(searchMessage[3]));
+//        System.out.println("Search end at neighbor node");
+//        int no_files = 0;
+//        int no_hops = NetworkConstants.NETWORK_HOPS - hops;
+//
+//        //send a response to the query originator when a file is found
+//        if (queriedList.length() != 0) {
+//            no_files = queriedList.split(" ").length;
+//            String response = no_files + " " + client.getAddress().getHostAddress() + " " + client.getPort() + " " + no_hops + " " + queriedList;
+//            response = MsgParser.sendMessageParser(response, "SEROK");
+//            System.out.println("client response  " + response);
+//            client.send(InetAddress.getByName(searchMessage[2]), Integer.parseInt(searchMessage[3]),response );
+//        }
+//    }
 
 }
