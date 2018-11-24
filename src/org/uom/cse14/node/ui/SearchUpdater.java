@@ -37,10 +37,13 @@ public class SearchUpdater extends SwingWorker<Integer, String> {
     @Override
     protected void done() {
 //        super.done(); //To change body of generated methods, choose Tools | Templates.
+        resultBox.removeAllItems();
         if (searchResult.size() > 0) {
+            
             for (String key : searchResult.keySet()) {
                 resultBox.addItem(key+" "+searchResult.get(key));
             }
+            searchResult.clear();
         }
     }
 
