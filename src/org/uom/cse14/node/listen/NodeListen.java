@@ -48,7 +48,7 @@ public class NodeListen implements Runnable {
                  */
                 DatagramPacket receivedPacket = new DatagramPacket(in, in.length);
                 serverSocket.receive(receivedPacket);
-
+                
                 /*
                  * Get the data from the packet we've just received
                  * and transform it to uppercase.
@@ -56,6 +56,7 @@ public class NodeListen implements Runnable {
                 String msg = new String(receivedPacket.getData()).trim();
                 String command = msg.split(" ")[1];
                 //System.out.println(msg);
+                client.inIncrement();
                 switch (command) {
                     case "JOIN" :
                         join(msg,receivedPacket.getAddress(),receivedPacket.getPort());
@@ -82,6 +83,11 @@ public class NodeListen implements Runnable {
                         searchResponseHandle(msg,receivedPacket.getAddress(),receivedPacket.getPort());
                         //Retry count down or add new request
                         break;
+                      
+                    case "LEAVE":
+                        System.out.println("leave query received");
+                        leave(msg);
+                        break;
 
                 }
             } catch (IOException e) {
@@ -93,6 +99,14 @@ public class NodeListen implements Runnable {
             }
 
         }
+    }
+    
+    private void leave(String msg){
+        String key = msg.trim().split(" ")[2].split(":")[0]+msg.trim().split(" ")[2].split(":")[1];
+        System.out.println("Size "+client.getClientList().size());
+        client.removeNeighbourByKey(key);
+        System.out.println("Size "+client.getClientList().size());
+        System.out.println(msg);
     }
     
     private void getSearchResults(String msg){

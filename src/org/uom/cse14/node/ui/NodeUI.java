@@ -87,6 +87,12 @@ public class NodeUI extends javax.swing.JFrame {
         resultBox = new javax.swing.JComboBox<>();
         jLabel9 = new javax.swing.JLabel();
         downloadBtn = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        ipTable = new javax.swing.JList<>();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        outMsgLabel = new javax.swing.JLabel();
+        inMsgLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -187,6 +193,12 @@ public class NodeUI extends javax.swing.JFrame {
 
         downloadBtn.setText("Download");
 
+        jScrollPane2.setViewportView(ipTable);
+
+        jLabel10.setText("In :");
+
+        jLabel11.setText("Out :");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -195,6 +207,20 @@ public class NodeUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel9))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(query)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(srchBtn)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(resultBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(downloadBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -226,26 +252,25 @@ public class NodeUI extends javax.swing.JFrame {
                                         .addComponent(joinBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(10, 10, 10)
                                         .addComponent(leaveBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(dfPathBtn)
-                            .addComponent(ufPathBtn))
-                        .addGap(0, 114, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
+                                .addComponent(jLabel11)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(inMsgLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel10))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(ufPathBtn)
+                                    .addComponent(dfPathBtn))))
+                        .addGap(12, 12, 12)
+                        .addComponent(outMsgLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel9))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 425, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(query)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(srchBtn)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(resultBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(downloadBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -283,10 +308,16 @@ public class NodeUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(joinBtn)
-                    .addComponent(leaveBtn))
+                    .addComponent(leaveBtn)
+                    .addComponent(jLabel11)
+                    .addComponent(outMsgLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(inMsgLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel10))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(query, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -297,7 +328,7 @@ public class NodeUI extends javax.swing.JFrame {
                     .addComponent(resultBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel9)
                     .addComponent(downloadBtn))
-                .addContainerGap(34, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -334,6 +365,7 @@ public class NodeUI extends javax.swing.JFrame {
             String response = bootstrap.registerClient(bootstrap.getBootstrapAddr().getHostAddress(), Integer.parseInt(nodeportText.getText()));
             NodeDiscovery discovery = new NodeDiscovery(client);
             new Thread(discovery, "nodeDiscovery").start();
+            new StatUpdater(ipTable, inMsgLabel, outMsgLabel, client).execute();
             consoleTextPane.append(response + "\n");
             System.out.println("response : " + response);
 
@@ -366,6 +398,7 @@ public class NodeUI extends javax.swing.JFrame {
             InetAddress inet = InetAddress.getLocalHost();
             String response = bootstrap.leaveClient(inet.getHostAddress(), Integer.parseInt(nodeportText.getText()));
             consoleTextPane.append(response + "\n");
+            client.leave();
         } catch (UnknownHostException ex) {
             Logger.getLogger(NodeUI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -484,7 +517,11 @@ public class NodeUI extends javax.swing.JFrame {
     private javax.swing.JButton dfPathBtn;
     private javax.swing.JButton downloadBtn;
     private javax.swing.JLabel dpathText;
+    private javax.swing.JLabel inMsgLabel;
+    private javax.swing.JList<String> ipTable;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -494,9 +531,11 @@ public class NodeUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton joinBtn;
     private javax.swing.JButton leaveBtn;
     private javax.swing.JTextField nodeportText;
+    private javax.swing.JLabel outMsgLabel;
     private javax.swing.JTextField query;
     private javax.swing.JComboBox<String> resultBox;
     private javax.swing.JButton srchBtn;

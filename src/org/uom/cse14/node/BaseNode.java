@@ -36,7 +36,9 @@ public class BaseNode extends BasicNode {
     private ConcurrentHashMap<String,String> taskList;
     private byte[] buf;
     private DatagramChannel channel;
-
+    private volatile int inCounter;
+    private volatile int outCounter;
+    
     public BaseNode(String userName, int port,String upFilePath) throws UnknownHostException, SocketException, IOException {
         socket = new DatagramSocket(NetworkConstants.SEND_PORT_OFFSET + port);
         this.port = port;
@@ -45,6 +47,8 @@ public class BaseNode extends BasicNode {
         this.userName = userName;
         clientList = new ConcurrentHashMap();
         taskList = new ConcurrentHashMap();
+        inCounter = 0;
+        outCounter = 0;
     }
 
     public BaseNode(InetAddress address, int port) {
@@ -70,6 +74,7 @@ public class BaseNode extends BasicNode {
     }
 
     public void send(InetAddress IPAddress, int port, String data ) throws IOException {
+        outIncrement();
         byte[] out = data.toUpperCase().getBytes();
         DatagramPacket sendPacket = new DatagramPacket(out, out.length, IPAddress, port);
         socket.send(sendPacket);
@@ -196,6 +201,9 @@ public class BaseNode extends BasicNode {
         String hashKey = neighbour.address.getHostAddress()+Integer.toString(neighbour.port);
         clientList.remove(hashKey);
     }
+    public void removeNeighbourByKey(String hashKey) {
+        clientList.remove(hashKey);
+    }
     
     public void addTask(String id,String task) {
         taskList.put(id,task);
@@ -204,9 +212,19 @@ public class BaseNode extends BasicNode {
     public void removeTask(String id) {
         taskList.remove(id);
     }
+    
     public void leave(){
         String msg = MsgParser.sendMessageParser(this, "LEAVE");
-        System.out.println(msg);
+        clientList.forEach((neighborKey,neighbor)->{
+            try {
+                    
+                send(neighbor.getAddress(), neighbor.getPort(),msg);
+                    
+            } catch (IOException e) {
+                System.out.println("Error leave"+ e);
+            }
+        });
+//        System.out.println(msg);
     }
     
     public void updateRetryCount(String hashkey, String type){
@@ -225,4 +243,20 @@ public class BaseNode extends BasicNode {
         }
     }
 
+    public synchronized void inIncrement() {
+        inCounter++;
+    }
+    public synchronized void outIncrement() {
+        outCounter++;
+    }
+
+    public synchronized int getInCounter() {
+        return inCounter;
+    }
+
+    public synchronized int getOutCounter() {
+        return outCounter;
+    }
+    
+    
 }
