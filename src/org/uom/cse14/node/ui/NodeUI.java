@@ -306,13 +306,14 @@ public class NodeUI extends javax.swing.JFrame {
                         .addComponent(upathText)
                         .addComponent(ufPathBtn)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(joinBtn)
-                    .addComponent(leaveBtn)
-                    .addComponent(jLabel11)
-                    .addComponent(outMsgLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(outMsgLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(inMsgLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel10))
+                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(joinBtn)
+                        .addComponent(leaveBtn)
+                        .addComponent(jLabel11)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
@@ -399,6 +400,7 @@ public class NodeUI extends javax.swing.JFrame {
             String response = bootstrap.leaveClient(inet.getHostAddress(), Integer.parseInt(nodeportText.getText()));
             consoleTextPane.append(response + "\n");
             client.leave();
+            System.exit(0);
         } catch (UnknownHostException ex) {
             Logger.getLogger(NodeUI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
