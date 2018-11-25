@@ -53,7 +53,7 @@ public class StatUpdater extends SwingWorker<Integer, String> {
         ipTable.removeAll();
         DefaultListModel demoList = new DefaultListModel();
         client.getClientList().forEach((neighborKey, neighbor) -> {   
-            demoList.addElement(neighbor.getAddress()+":"+neighbor.getPort());    
+            demoList.addElement(neighbor.getAddress().getHostAddress()+":"+neighbor.getPort());    
         });
         ipTable.setModel(demoList);
 //        System.out.println("in out count"+client.getInCounter()+" "+client.getOutCounter());

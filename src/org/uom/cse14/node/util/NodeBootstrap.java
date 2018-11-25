@@ -41,6 +41,7 @@ public class NodeBootstrap {
         String msg = "REG "+address+" "+port+" "+getClient().getUserName();
         msg = msg.length()+" "+msg;
         String response = getClient().sendMsg(msg, getBootstrapAddr(), getBootstrapPort());
+        System.out.println(response);
         String[] commandList = response.split(" ");
         System.out.println(response);
         int responsetype = Integer.parseInt(response.split(" ")[2].trim());
@@ -52,11 +53,19 @@ public class NodeBootstrap {
             return "bootstrap says no user";
         }else if(responsetype == 1){
             NeighbourNode client = new NeighbourNode(InetAddress.getByName(commandList[commandList.length-2].trim()), Integer.parseInt(commandList[commandList.length-1].trim()));
+            String joinMsg = this.getClient().getAddress().getHostAddress()+" "+Integer.toString(this.getClient().getPort());
+            joinMsg = MsgParser.sendMessageParser(joinMsg, "JOIN");
+            this.getClient().send(InetAddress.getByName(commandList[commandList.length-2].trim()),Integer.parseInt(commandList[commandList.length-1].trim()),joinMsg);
             this.getClient().addNeighbour(client);
+            
         }else if(responsetype == 2){
             NeighbourNode client = new NeighbourNode(InetAddress.getByName(commandList[commandList.length-2].trim()), Integer.parseInt(commandList[commandList.length-1].trim()));
             this.getClient().addNeighbour(client);
+            String joinMsg = this.getClient().getAddress().getHostAddress()+" "+Integer.toString(this.getClient().getPort());
+            joinMsg = MsgParser.sendMessageParser(joinMsg, "JOIN");
+            this.getClient().send(InetAddress.getByName(commandList[commandList.length-2].trim()),Integer.parseInt(commandList[commandList.length-1].trim()),joinMsg);
             client = new NeighbourNode(InetAddress.getByName(commandList[commandList.length-4].trim()), Integer.parseInt(commandList[commandList.length-3].trim()));
+            this.getClient().send(InetAddress.getByName(commandList[commandList.length-4].trim()),Integer.parseInt(commandList[commandList.length-3].trim()),joinMsg);
             this.getClient().addNeighbour(client);
         }
         return response;

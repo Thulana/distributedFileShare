@@ -25,9 +25,9 @@ public class NodeController {
     public static int bootstrapPort = 55555;
     public static void main(String[] args) {
         try {
-
+            InetAddress inetAddress = InetAddress.getByName("192.168.0.105");
             ConcurrentHashMap<String,String> results = new ConcurrentHashMap<>();
-            BaseNode client = new BaseNode("testClient2",2237,"dfdv");
+            BaseNode client = new BaseNode("testClient2",2237,inetAddress,"dfdv");
             NodeListen clientServer = new NodeListen(2236, client,results);
             new Thread(clientServer,"nodeServer").start();
             NodeBootstrap bootstrap = new NodeBootstrap(client, InetAddress.getByName(NodeController.bootstrapIP),NodeController.bootstrapPort );

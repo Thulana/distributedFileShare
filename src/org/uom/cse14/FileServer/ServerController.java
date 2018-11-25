@@ -5,6 +5,7 @@
  */
 package org.uom.cse14.FileServer;
 
+import java.net.InetAddress;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -19,10 +20,11 @@ import static org.uom.cse14.node.util.NetworkConstants.TCP_PORT_OFFSET;
 public class ServerController {
     FileServer fs;
         
-    public void createServer(String upPath,int portNum){
+    public void createServer(String upPath,int portNum,InetAddress nodeIp){
         try{
         fs = new FileServer(upPath);
-        System.setProperty("java.rmi.server.hostname","192.168.8.100");
+        String nodeIP = nodeIp.getHostAddress();
+        System.setProperty("java.rmi.server.hostname",nodeIP);
         FileInterface stub = (FileInterface)UnicastRemoteObject.exportObject(fs, 0);
         Registry registry = LocateRegistry.createRegistry(portNum+TCP_PORT_OFFSET);
         registry.bind("Hello", stub);

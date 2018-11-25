@@ -39,10 +39,10 @@ public class BaseNode extends BasicNode {
     private volatile int inCounter;
     private volatile int outCounter;
     
-    public BaseNode(String userName, int port,String upFilePath) throws UnknownHostException, SocketException, IOException {
+    public BaseNode(String userName, int port,InetAddress nodeIP,String upFilePath) throws UnknownHostException, SocketException, IOException {
         socket = new DatagramSocket(NetworkConstants.SEND_PORT_OFFSET + port);
         this.port = port;
-        this.address = InetAddress.getByName("localhost");
+        this.address = nodeIP;
         this.upFilePath = upFilePath;
         this.userName = userName;
         clientList = new ConcurrentHashMap();
@@ -75,7 +75,7 @@ public class BaseNode extends BasicNode {
 
     public void send(InetAddress IPAddress, int port, String data ) throws IOException {
         outIncrement();
-        byte[] out = data.toUpperCase().getBytes();
+        byte[] out = data.getBytes();
         DatagramPacket sendPacket = new DatagramPacket(out, out.length, IPAddress, port);
         socket.send(sendPacket);
     }
@@ -95,8 +95,7 @@ public class BaseNode extends BasicNode {
             String tmpFileQuery = fileQuery.toLowerCase();
             for (Object obj: fileList) {
                 fileName =  (String)obj;
-                fileName = fileName.toLowerCase();
-                if (fileName.contains(tmpFileQuery)){
+                if (fileName.toLowerCase().contains(tmpFileQuery)){
                     fileNameList = fileNameList + fileName + " ";
                     System.out.println("Found"+fileName);
                     isFileThere = true;
@@ -167,7 +166,7 @@ public class BaseNode extends BasicNode {
         }
         if(isFileThere){
             int no_files = fileNameList.split(" ").length;
-            String response = no_files + " " + this.address + " " + this.port + " " + hops + " " + fileNameList;
+            String response = no_files + " " + this.address.getHostAddress() + " " + this.port + " " + hops + " " + fileNameList;
             response = MsgParser.sendMessageParser(response, "SEROK");
             System.out.println("client response  " + response);
             this.send(originatorIp, originatorPort,response );

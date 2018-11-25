@@ -72,7 +72,6 @@ public class MsgParser {
             case "JOIN":
                 return new Object[] {0, "error", "response" };
 
-            case "SER":
 
 
         }
@@ -112,6 +111,10 @@ public class MsgParser {
                 break;
 
             case "SEROK":
+                messageText = messageText + (String)messageData;
+                break;
+                
+            case "JOIN":
                 messageText = messageText + (String)messageData;
                 break;
         }

@@ -72,7 +72,7 @@ public class NodeListen implements Runnable {
                         break;
                     case "SEROK":
                         System.out.println("comes to the query originator");
-
+                     
                         getSearchResults(msg);
 
                         //lets begin the download
@@ -124,7 +124,8 @@ public class NodeListen implements Runnable {
 
 
     private void join(String msg,InetAddress address,int port ) throws IOException {
-        NeighbourNode newClient = new NeighbourNode( msg.split(" ")[4],InetAddress.getByName(msg.split(" ")[2]), Integer.parseInt(msg.split(" ")[3]));
+        System.out.println(msg);
+        NeighbourNode newClient = new NeighbourNode(InetAddress.getByName(msg.split(" ")[2]), Integer.parseInt(msg.split(" ")[3]));
         client.addNeighbour(newClient);
 
         //Use MsgParser For this

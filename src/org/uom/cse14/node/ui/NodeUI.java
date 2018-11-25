@@ -6,6 +6,7 @@
 package org.uom.cse14.node.ui;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -348,29 +349,21 @@ public class NodeUI extends javax.swing.JFrame {
 
     private void joinBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinBtnActionPerformed
         try {
-
-//            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-//            for (NetworkInterface netint : Collections.list(nets)) {
-//                out.printf("Display name: %s\n", netint.getDisplayName());
-//                out.printf("Name: %s\n", netint.getName());
-//                Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
-//                Collections.list(inetAddresses).forEach((inetAddress) -> {
-//                    out.printf("InetAddress: %s\n", inetAddress);
-//                });
-//                out.printf("\n");
-//            }
+             final DatagramSocket testSocket = new DatagramSocket();
+            testSocket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            InetAddress nodeIP = testSocket.getLocalAddress();
    
-            client = new BaseNode(usernameText.getText(), Integer.parseInt(nodeportText.getText()),upFilePath);
+            client = new BaseNode(usernameText.getText(), Integer.parseInt(nodeportText.getText()),nodeIP,upFilePath);
             clientServer = new NodeListen(Integer.parseInt(nodeportText.getText()), client,results);
             worker= new TaskWorker(client);
             fClient = new FileClient(downFilePath);
             //fClient.downloadFile("TestFile.txt");
             fileController = new ServerController();
-            fileController.createServer(upFilePath,Integer.parseInt(nodeportText.getText()));
+            fileController.createServer(upFilePath,Integer.parseInt(nodeportText.getText()),nodeIP);
             new Thread(clientServer, "nodeServer").start();
             new Thread(worker, "worker").start();
             bootstrap = new NodeBootstrap(client, InetAddress.getByName(boostrapIpText.getText()), Integer.parseInt(boostrapPortText.getText()));
-            String response = bootstrap.registerClient(bootstrap.getBootstrapAddr().getHostAddress(), Integer.parseInt(nodeportText.getText()));
+            String response = bootstrap.registerClient(nodeIP.getHostAddress(), Integer.parseInt(nodeportText.getText()));
             NodeDiscovery discovery = new NodeDiscovery(client);
             new Thread(discovery, "nodeDiscovery").start();
             new StatUpdater(ipTable, inMsgLabel, outMsgLabel, client).execute();
@@ -481,7 +474,7 @@ public class NodeUI extends javax.swing.JFrame {
     private void downloadBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadBtnActionPerformed
         String fileData = (String) resultBox.getSelectedItem();
         String filename = fileData.split(" ")[0];
-        String ip = fileData.split(" ")[1].split("/")[1];
+        String ip = fileData.split(" ")[1];
         int port = Integer.parseInt(fileData.split(" ")[2]);
         fClient.downloadFile(filename, ip, port);
     }//GEN-LAST:event_downloadBtnActionPerformed

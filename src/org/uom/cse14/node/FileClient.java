@@ -6,6 +6,7 @@ import java.io.*;
 import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import static org.uom.cse14.node.util.NetworkConstants.TCP_PORT_OFFSET;
 
 
 
@@ -19,7 +20,7 @@ public class FileClient{
     public  void downloadFile(String fileName, String serverIp,int serverPort) {
         
         try {
-            Registry registry = LocateRegistry.getRegistry(serverIp,serverPort);
+            Registry registry = LocateRegistry.getRegistry(serverIp,serverPort+TCP_PORT_OFFSET);
             FileInterface stub = (FileInterface) registry.lookup("Hello");
             //byte[] fileData = stub.downloadFile("TestFile.txt");
             byte[] fileData = stub.downloadFile(fileName);
