@@ -389,11 +389,12 @@ public class NodeUI extends javax.swing.JFrame {
             new Thread(worker, "worker").start();
             bootstrap = new NodeBootstrap(client, InetAddress.getByName(boostrapIpText.getText()), Integer.parseInt(boostrapPortText.getText()));
             String response = bootstrap.registerClient(clientIpText.getText(), Integer.parseInt(nodeportText.getText()));
+            consoleTextPane.append(response + "\n");
+            System.out.println("response : " + response);
             NodeDiscovery discovery = new NodeDiscovery(client);
             new Thread(discovery, "nodeDiscovery").start();
             new StatUpdater(ipTable, inMsgLabel, outMsgLabel, client).execute();
-            consoleTextPane.append(response + "\n");
-            System.out.println("response : " + response);
+            
 
         } catch (UnknownHostException ex) {
             Logger.getLogger(NodeController.class.getName()).log(Level.SEVERE, null, ex);
