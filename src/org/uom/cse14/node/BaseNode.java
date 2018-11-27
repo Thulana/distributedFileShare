@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.uom.cse14.node.util.MsgParser;
 import org.uom.cse14.node.util.NetworkConstants;
 
@@ -85,6 +88,9 @@ public class BaseNode extends BasicNode {
         String fileNameList = "";
         String originatorHashKey = originatorIp.getHostAddress()+originatorPort;
         String searchParentHashkey = senderIp.getHostAddress()+senderPort;
+        String pattern;
+        Pattern p;
+        Matcher m;
 
         System.out.println("Searching file......");
         boolean isFileThere = false;
@@ -96,9 +102,14 @@ public class BaseNode extends BasicNode {
             for (Object obj: fileList) {
                 fileName =  (String)obj;
                 if (fileName.toLowerCase().contains(tmpFileQuery)){
+                    pattern = "\\b"+tmpFileQuery+"\\b";
+                    p=Pattern.compile(pattern);
+                    m=p.matcher(fileName.toLowerCase());
                     fileNameList = fileNameList + fileName + " ";
                     System.out.println("Found"+fileName);
-                    isFileThere = true;
+                    isFileThere = m.find();
+
+
                     }
             }
             
