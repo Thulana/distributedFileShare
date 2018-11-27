@@ -190,7 +190,6 @@ public class NodeListen implements Runnable {
      *sends a response to the search originator after receiving search request
      */
     private  void searchResponse(String msg , InetAddress address , int port) throws IOException {
-        System.out.println("piyu");
         String[] searchMessage = msg.split(" ");
         String searchReceived = client.getAddress().getHostAddress() + " " + client.getPort()+" "+searchMessage[4];
         searchReceived = MsgParser.sendMessageParser(searchReceived,"SER_R");
