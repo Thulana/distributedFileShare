@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 import org.uom.cse14.node.BaseNode;
-import org.uom.cse14.node.NeighbourNode;
 
 
 /**
