@@ -52,21 +52,21 @@ public class NodeBootstrap {
 //            System.out.println("bootstrap says no user");
             return "bootstrap says no user";
         }else if(responsetype == 1){
-            NeighbourNode client = new NeighbourNode(InetAddress.getByName(commandList[commandList.length-2].trim()), Integer.parseInt(commandList[commandList.length-1].trim()));
+            //NeighbourNode client = new NeighbourNode(InetAddress.getByName(commandList[commandList.length-2].trim()), Integer.parseInt(commandList[commandList.length-1].trim()));
             String joinMsg = this.getClient().getAddress().getHostAddress()+" "+Integer.toString(this.getClient().getPort());
             joinMsg = MsgParser.sendMessageParser(joinMsg, "JOIN");
             this.getClient().send(InetAddress.getByName(commandList[commandList.length-2].trim()),Integer.parseInt(commandList[commandList.length-1].trim()),joinMsg);
-            this.getClient().addNeighbour(client);
+            //this.getClient().addNeighbour(client);
             
         }else if(responsetype == 2){
-            NeighbourNode client = new NeighbourNode(InetAddress.getByName(commandList[commandList.length-2].trim()), Integer.parseInt(commandList[commandList.length-1].trim()));
-            this.getClient().addNeighbour(client);
+            //NeighbourNode client = new NeighbourNode(InetAddress.getByName(commandList[commandList.length-2].trim()), Integer.parseInt(commandList[commandList.length-1].trim()));
+            //this.getClient().addNeighbour(client);
             String joinMsg = this.getClient().getAddress().getHostAddress()+" "+Integer.toString(this.getClient().getPort());
             joinMsg = MsgParser.sendMessageParser(joinMsg, "JOIN");
             this.getClient().send(InetAddress.getByName(commandList[commandList.length-2].trim()),Integer.parseInt(commandList[commandList.length-1].trim()),joinMsg);
-            client = new NeighbourNode(InetAddress.getByName(commandList[commandList.length-4].trim()), Integer.parseInt(commandList[commandList.length-3].trim()));
+            //client = new NeighbourNode(InetAddress.getByName(commandList[commandList.length-4].trim()), Integer.parseInt(commandList[commandList.length-3].trim()));
             this.getClient().send(InetAddress.getByName(commandList[commandList.length-4].trim()),Integer.parseInt(commandList[commandList.length-3].trim()),joinMsg);
-            this.getClient().addNeighbour(client);
+            //this.getClient().addNeighbour(client);
         }
         return response;
     }

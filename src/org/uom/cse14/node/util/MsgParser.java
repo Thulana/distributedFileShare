@@ -117,6 +117,10 @@ public class MsgParser {
             case "JOIN":
                 messageText = messageText + (String)messageData;
                 break;
+                
+            case "JOINOK":
+                messageText = messageText + Integer.toString((int) messageData);
+                break;
         }
 
         return formatMsgLength(messageText);

@@ -88,6 +88,10 @@ public class NodeListen implements Runnable {
                         System.out.println("leave query received");
                         leave(msg);
                         break;
+                        
+                    case "JOINOK":
+                        joinResponse(msg,receivedPacket.getAddress(),receivedPacket.getPort());
+                        break;
 
                 }
             } catch (IOException e) {
@@ -129,10 +133,12 @@ public class NodeListen implements Runnable {
         client.addNeighbour(newClient);
 
         //Use MsgParser For this
-        String reply = "JOINOK 0";
-        reply = reply.length()+" "+reply;
+        //String reply = "JOINOK 0";
+        int joinStatus = 0;
+        String reply = MsgParser.sendMessageParser(joinStatus,"JOINOK");
+        //reply = reply.length()+" "+reply;
         //Use MsgParser For this
-        client.send(address, port, reply);
+        client.send(address, (port- NetworkConstants.SEND_PORT_OFFSET), reply);
     }
 
     private void discover(String msg,InetAddress address,int port) throws IOException {
@@ -204,6 +210,13 @@ public class NodeListen implements Runnable {
         String hash = "SR&"+searchRMessage[4]+"&"+address.getHostAddress()+portS;
         client.updateRetryCount(address.getHostAddress()+portS, "decre");
         client.removeTask(hash);       
+    }
+    
+    private void joinResponse(String msg , InetAddress address , int port){
+    if (msg.split(" ")[2].equals("0")){
+            NeighbourNode neighbourClient = new NeighbourNode(address, (port- NetworkConstants.SEND_PORT_OFFSET));
+            client.addNeighbour(neighbourClient);
+        }    
     }
 
 /**
