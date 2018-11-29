@@ -23,6 +23,7 @@ public class FileClient{
             Registry registry = LocateRegistry.getRegistry(serverIp,serverPort+TCP_PORT_OFFSET);
             FileInterface stub = (FileInterface) registry.lookup("Hello");
             //byte[] fileData = stub.downloadFile("TestFile.txt");
+            fileName =fileName.replace("_"," ");
             byte[] fileData = stub.downloadFile(fileName);
             System.out.printf(Integer.toString(fileData.length));
             File file = new File(fileName);

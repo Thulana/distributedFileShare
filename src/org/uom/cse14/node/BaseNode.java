@@ -105,9 +105,14 @@ public class BaseNode extends BasicNode {
                     pattern = "\\b"+tmpFileQuery+"\\b";
                     p=Pattern.compile(pattern);
                     m=p.matcher(fileName.toLowerCase());
-                    fileNameList = fileNameList + fileName + " ";
-                    System.out.println("Found"+fileName);
-                    isFileThere = m.find();
+                    if(m.find()){
+                        fileName = fileName.trim();
+                        fileName =fileName.replace(" ","_");
+                        fileNameList = fileNameList + fileName + " ";
+                        System.out.println("Found"+fileName);
+                        isFileThere = true;
+                    }
+                    
 
 
                     }
