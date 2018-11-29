@@ -10,12 +10,14 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import org.uom.cse14.FileServer.ServerController;
 import org.uom.cse14.TaskWorker.TaskWorker;
 import org.uom.cse14.node.BaseNode;
@@ -502,7 +504,19 @@ public class NodeUI extends javax.swing.JFrame {
         String filename = fileData.split(" ")[0];
         String ip = fileData.split(" ")[1];
         int port = Integer.parseInt(fileData.split(" ")[2]);
-        fClient.downloadFile(filename, ip, port);
+        try {
+           int result =  fClient.downloadFile(filename, ip, port);
+           if (result==1){
+               JOptionPane.showMessageDialog(this, "DOWNLOAD COMPLETED SUCCESSFULLY", "MESSAGE", JOptionPane.INFORMATION_MESSAGE);
+               
+           }
+           else{
+               JOptionPane.showMessageDialog(this, "DOWNLOAD ERROR", "MESSAGE", JOptionPane.ERROR_MESSAGE);
+           }
+        } catch (Exception ex) {
+            Logger.getLogger(NodeUI.class.getName()).log(Level.SEVERE, null, ex);
+          
+        }
     }//GEN-LAST:event_downloadBtnActionPerformed
 
     private void clientIpTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clientIpTextActionPerformed

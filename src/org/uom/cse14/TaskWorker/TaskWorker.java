@@ -44,9 +44,7 @@ public class TaskWorker implements Runnable {
                     switch(idMain[0]){
                         case "SR":
                             String[] msgData = task.split("&");
-                            System.out.println(msgData[0]);
-                            if(TimestampUtill.TimeComparator(msgData[0],5000)){
-                   
+                            if(TimestampUtill.TimeComparator(msgData[0],5000)){                   
                                 client.updateRetryCount(idMain[2],"incre");
                                 if (!msgData[1].equals("None")){
                                     try {
@@ -58,6 +56,12 @@ public class TaskWorker implements Runnable {
                                     }
                                 }
                                  removeList.add(id);
+                             }
+                         break;
+                         case "DC":
+                            if(TimestampUtill.TimeComparator(task,5000)){
+                                client.updateRetryCount(idMain[1],"incre");
+                                removeList.add(id);
                              }
                             
                          break;

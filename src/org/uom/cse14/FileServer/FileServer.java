@@ -2,6 +2,10 @@ package org.uom.cse14.FileServer;
 
 import javax.swing.*;
 import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FileServer  extends JPanel implements  FileInterface {
 
@@ -28,15 +32,52 @@ public class FileServer  extends JPanel implements  FileInterface {
             return(null);
         }
     }
-
+    
     @Override
-    public int addTwo(int a, int b) {
+    public String getHash(String fileName) {
+    
+        MessageDigest shaDigest = null;
         try {
-        return a+b;
-        } catch(Exception e){
-            System.out.println("FileImpl: "+e.getMessage());
-            e.printStackTrace();
-            return 0;
+            shaDigest = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(FileServer.class.getName()).log(Level.SEVERE, null, ex);
         }
+ 
+//SHA-1 checksum
+        File file = new File(uploadFilePath+"/"+fileName);
+        String shaChecksum = null;
+        try {
+            shaChecksum = getFileChecksum(shaDigest, file);
+        } catch (IOException ex) {
+            Logger.getLogger(FileServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return shaChecksum;
+
+    }
+    
+    private static String getFileChecksum(MessageDigest digest, File file) throws IOException
+    {
+        //Create byte array to read data in chunks
+        try ( //Get file input stream for reading the file content
+                FileInputStream fis = new FileInputStream(file)) {
+            //Create byte array to read data in chunks
+            byte[] byteArray = new byte[1024];
+            int bytesCount = 0;
+            //Read file data and update in message digest
+            while ((bytesCount = fis.read(byteArray)) != -1) {
+                digest.update(byteArray, 0, bytesCount);
+            }       ;
+            //close the stream; We don't need it now.
+        }
+     
+        byte[] bytes = digest.digest();
+    
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i< bytes.length ;i++)
+        {
+            sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        return sb.toString();
     }
 }

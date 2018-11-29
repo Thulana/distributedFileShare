@@ -71,11 +71,8 @@ public class NodeListen implements Runnable {
                         searchResponse(msg,receivedPacket.getAddress(),receivedPacket.getPort());
                         break;
                     case "SEROK":
-                        System.out.println("comes to the query originator");
-                     
+                        System.out.println("comes to the query originator");                     
                         getSearchResults(msg);
-
-                        //lets begin the download
 
                         break;
                     case "SER_R":
@@ -143,6 +140,7 @@ public class NodeListen implements Runnable {
 
     private void discover(String msg,InetAddress address,int port) throws IOException {
         Object[] response = MsgParser.receivedMessageParser(msg,"DISCOVER");
+        
         if ((int)response[0] == 0){
             appendNeighbour(client,(InetAddress) response[2],(int)response[3]);
             String discoverResponse = MsgParser.sendMessageParser(this.client,"R_DISCOVER");
@@ -154,6 +152,12 @@ public class NodeListen implements Runnable {
     }
 
     private void discoverResponse(String msg,InetAddress address,int port) {
+        String portS = Integer.toString(port- NetworkConstants.SEND_PORT_OFFSET);
+        String hash = "DC&"+address.getHostAddress()+portS;
+        client.updateRetryCount(address.getHostAddress()+portS, "decre");
+        client.removeTask(hash);
+        NeighbourNode neighbour = new NeighbourNode(address, port- NetworkConstants.SEND_PORT_OFFSET);
+        client.addNeighbour(neighbour);
         Object[] response = MsgParser.receivedMessageParser(msg,"R_DISCOVER");
         String myHash = client.getAddress().getHostAddress()+Integer.toString(client.getPort());
         if ((int)response[0] == 0){

@@ -112,13 +112,11 @@ public class BaseNode extends BasicNode {
                         System.out.println("Found"+fileName);
                         isFileThere = true;
                     }
-                    
-
-
-                    }
+                   
+                 }
             }
             
-            if(!isFileThere & hops > 0 ){
+            if( hops > 0 ){
             int newHops = hops-1;
             System.out.println("Forward Search to Neighbors");
                 //forward msg to all the neighbors
@@ -243,7 +241,7 @@ public class BaseNode extends BasicNode {
     }
     
     public void updateRetryCount(String hashkey, String type){
-        if(clientList.contains(hashkey)){
+        if(clientList.containsKey(hashkey)){
             int count = clientList.get(hashkey).getRetryCount();
             switch(type){
                 case "incre":
