@@ -201,11 +201,14 @@ public class NodeListen implements Runnable {
      */
     private  void searchResponse(String msg , InetAddress address , int port) throws IOException {
         String[] searchMessage = msg.split(" ");
-        String searchReceived = client.getAddress().getHostAddress() + " " + client.getPort()+" "+searchMessage[4];
+        String[] fileName = Arrays.copyOfRange(searchMessage, 4, searchMessage.length-1);
+        String fileNameCombined = String.join(" ", fileName);
+        System.out.println(fileNameCombined);
+        String searchReceived = client.getAddress().getHostAddress() + " " + client.getPort()+" "+fileNameCombined;
         searchReceived = MsgParser.sendMessageParser(searchReceived,"SER_R");
         System.out.println(searchReceived + " send to " + (port - NetworkConstants.SEND_PORT_OFFSET));
         client.send(address,port - NetworkConstants.SEND_PORT_OFFSET,searchReceived);//send reply to the search originator
-        this.client.search(searchMessage[4],Integer.parseInt(searchMessage[5]),InetAddress.getByName(searchMessage[2] ),Integer.parseInt(searchMessage[3]),address,port - NetworkConstants.SEND_PORT_OFFSET);
+        this.client.search(fileNameCombined,Integer.parseInt(searchMessage[searchMessage.length-1]),InetAddress.getByName(searchMessage[2] ),Integer.parseInt(searchMessage[3]),address,port - NetworkConstants.SEND_PORT_OFFSET);
     }
 
     private void searchResponseHandle(String msg, InetAddress address, int port) {

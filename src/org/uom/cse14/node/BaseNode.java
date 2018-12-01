@@ -116,9 +116,35 @@ public class BaseNode extends BasicNode {
                  }
             }
             
-            if( hops > 0 ){
+             if(hops >= (NetworkConstants.NETWORK_HOPS - NetworkConstants.BROADCAST_HOPS)){
+                int newHops = hops-1;
+                System.out.println("Neighbor broadcast to all");
+                //forward msg to all the neighbors
+                Date nowDate = new Date();  
+                DateFormat formatter;
+                formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                clientList.forEach((neighborKey,neighbor)->{
+                    try {
+                        System.out.println(originatorHashKey);
+                        if (!neighborKey.equals(originatorHashKey)){
+                            if (!neighborKey.equals(searchParentHashkey)){
+                                String msg = originatorIp.getHostAddress() + " " + originatorPort + " " + fileQuery + " " + newHops ;
+                                msg = MsgParser.sendMessageParser(msg, "SER");
+                                System.out.println("send msg " + msg);
+                                send(neighbor.getAddress(), neighbor.getPort(),msg);
+                                addTask("SR&"+ fileQuery+"&"+neighbor.getAddress().toString().substring(1)+neighbor.getPort(),formatter.format(nowDate)+"&None&None&None");
+                            }
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Error search forward"+ e);
+                    }
+                    
+                });
+            }
+            
+            else if( hops > 0 ){
             int newHops = hops-1;
-            System.out.println("Forward Search to Neighbors");
+            System.out.println("Forward Search to two Neighbors");
                 //forward msg to all the neighbors
                 ArrayList <NeighbourNode> neighborList = new ArrayList();
                 clientList.forEach((neighborKey,neighbor)->{
@@ -144,7 +170,6 @@ public class BaseNode extends BasicNode {
                 Date nowDate = new Date();  
                 DateFormat formatter;
                 formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                System.out.println(tempName.size());
                 for (int i = 0; i<tempName.size(); i++){
                     if (neighborList.size()> 0){
                         NeighbourNode neighbour = neighborList.get(new Random().nextInt(neighborList.size()));
